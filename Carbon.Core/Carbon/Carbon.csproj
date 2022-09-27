@@ -31,6 +31,7 @@
     <FileVersion>$(VersionPrefix)</FileVersion>
     <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
     <Title>Carbon</Title>
+    <UserSecretsId>44d3b4ac-7e08-4d50-b865-d659ba8c37bc</UserSecretsId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
