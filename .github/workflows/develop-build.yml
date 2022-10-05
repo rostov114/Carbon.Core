@@ -88,6 +88,7 @@ jobs:
     name: 🪟 Windows
     needs: bootstrap
     runs-on: windows-latest
+    continue-on-error: false
     
     steps:
     - name: 🔗 Checkout source code from github
@@ -150,7 +151,7 @@ jobs:
           
           ${{ needs.build-linux.outputs.build_info }}
 
-          Production: https://github.com/Carbon-Modding/Carbon.Core/releases/latest
+          [stable]: https://github.com/Carbon-Modding/Carbon.Core/releases/latest
         files: |
           Release/Carbon.dll
           Release/Carbon.Patch.zip
