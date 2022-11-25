@@ -23,6 +23,7 @@ regex:UnityEngine.ImageConversionModule.dll
 regex:UnityEngine.PhysicsModule.dll
 regex:UnityEngine.SharedInternalsModule.dll
 regex:UnityEngine.TextRenderingModule.dll
+regex:UnityEngine.TerrainModule.dll
 regex:UnityEngine.UI.dll
 regex:UnityEngine.UnityWebRequestAssetBundleModule.dll
 regex:UnityEngine.UnityWebRequestAudioModule.dll

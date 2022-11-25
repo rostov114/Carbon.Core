@@ -13,20 +13,10 @@ namespace Carbon.Core
 {
 	public class HookValidator
 	{
-		public static List<string> CarbonHooks { get; private set; } = new List<string>(500);
 		public static HookPackage OxideHooks { get; private set; }
 
 		public static void Refresh()
 		{
-			CarbonHooks.Clear();
-
-			foreach (var entry in typeof(HookValidator).Assembly.GetTypes())
-			{
-				var hook = entry.GetCustomAttribute<Hook>();
-				if (hook == null) continue;
-				CarbonHooks.Add(hook.Name);
-			}
-
 			Community.Runtime.CorePlugin.webrequest.Enqueue("https://raw.githubusercontent.com/OxideMod/Oxide.Rust/develop/resources/Rust.opj", null, (error, data) =>
 			{
 				OxideHooks = JsonConvert.DeserializeObject<HookPackage>(data);
@@ -35,7 +25,7 @@ namespace Carbon.Core
 
 		public static bool IsIncompatibleOxideHook(string hook)
 		{
-			if (CarbonHooks.Contains(hook)) return false;
+			if (CarbonHookExists(hook)) return false;
 
 			if (OxideHooks != null)
 			{
@@ -49,6 +39,21 @@ namespace Carbon.Core
 						if (hookName == hook) return true;
 					}
 				}
+			}
+
+			return false;
+		}
+
+		public static bool CarbonHookExists(string hookName)
+		{
+			foreach (var hook in Defines.CoreHooks)
+			{
+				if (hook.Name == hookName) return true;
+			}
+
+			foreach (var hook in Defines.DynamicHooks)
+			{
+				if (hook.Name == hookName) return true;
 			}
 
 			return false;

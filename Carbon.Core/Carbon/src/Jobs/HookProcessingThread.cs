@@ -28,13 +28,17 @@ namespace Carbon.Jobs
 		{
 			if (string.IsNullOrEmpty(HookName)) return;
 
-			foreach (var type in Defines.Carbon.GetTypes())
+			var hooks = Pool.GetList<Hook>();
+
+			hooks.AddRange(Defines.CoreHooks);
+			hooks.AddRange(Defines.DynamicHooks);
+
+			foreach (var hook in hooks)
 			{
 				try
 				{
-					var parameters = type.GetCustomAttributes<Hook.Parameter>();
-					var hook = type.GetCustomAttribute<Hook>();
-					var args = $"[{type.Name}]_";
+					var parameters = hook.Type.GetCustomAttributes<Hook.Parameter>();
+					var args = $"[{hook.Type.Name}]_";
 
 					if (parameters != null)
 					{
@@ -49,14 +53,14 @@ namespace Carbon.Jobs
 					if (hook.Name == HookName)
 					{
 						var patchId = $"{hook.Name}{args}";
-						var patch = type.GetCustomAttribute<Hook.Patch>();
+						var patch = hook.Type.GetCustomAttribute<Hook.Patch>();
 						var hookInstance = (HookProcessor.HookInstance)null;
 
 						if (!Processor.Patches.TryGetValue(HookName, out hookInstance))
 						{
 							Processor.Patches.Add(HookName, hookInstance = new HookProcessor.HookInstance
 							{
-								AlwaysPatched = type.GetCustomAttribute<Hook.AlwaysPatched>() != null
+								AlwaysPatched = hook.Type.GetCustomAttribute<Hook.AlwaysPatched>() != null
 							});
 						}
 
@@ -66,7 +70,7 @@ namespace Carbon.Jobs
 
 						if (DoRequires)
 						{
-							var requires = type.GetCustomAttributes<Hook.Require>();
+							var requires = hook.Type.GetCustomAttributes<Hook.Require>();
 
 							if (requires != null)
 							{
@@ -80,9 +84,9 @@ namespace Carbon.Jobs
 						}
 
 						var originalParameters = new List<Type>();
-						var prefix = type.GetMethod("Prefix");
-						var postfix = type.GetMethod("Postfix");
-						var transpiler = type.GetMethod("Transpiler");
+						var prefix = hook.Type.GetMethod("Prefix");
+						var postfix = hook.Type.GetMethod("Postfix");
+						var transpiler = hook.Type.GetMethod("Transpiler");
 
 						foreach (var param in (prefix ?? postfix ?? transpiler).GetParameters())
 						{
@@ -115,7 +119,7 @@ namespace Carbon.Jobs
 				catch (HarmonyException e)
 				{
 					StringBuilder sb = new StringBuilder();
-					sb.AppendLine($" Couldn't patch hook '{HookName}' ({e.GetType()}: {type.FullName})");
+					sb.AppendLine($" Couldn't patch hook '{HookName}' ({e.GetType()}: {hook.Type.FullName})");
 					sb.AppendLine($">> hook:{HookName} index:{e.GetErrorIndex()} offset:{e.GetErrorOffset()}");
 					sb.AppendLine($">> IL instructions:");
 
@@ -128,9 +132,11 @@ namespace Carbon.Jobs
 #endif
 				catch (System.Exception e)
 				{
-					Logger.Error($" Couldn't patch hook '{HookName}' ({e.GetType()}: {type.FullName})", e);
+					Logger.Error($" Couldn't patch hook '{HookName}' ({e.GetType()}: {hook.Type.FullName})", e);
 				}
 			}
+
+			Pool.FreeList(ref hooks);
 		}
 	}
 }

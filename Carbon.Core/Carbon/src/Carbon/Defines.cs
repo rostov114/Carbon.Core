@@ -18,12 +18,13 @@ namespace Carbon.Core
 	{
 		public static Assembly Carbon { get; internal set; }
 
-		public static List<Hook> Hooks { get; internal set; }
+		public static List<Hook> CoreHooks { get; internal set; }
+		public static List<Hook> DynamicHooks { get; internal set; }
 
 		public static void Initialize()
 		{
-			Hooks?.Clear();
-			Hooks = new List<Hook>();
+			CoreHooks?.Clear();
+			CoreHooks = new List<Hook>();
 
 			Carbon = typeof(Community).Assembly;
 
@@ -33,7 +34,7 @@ namespace Carbon.Core
 				if (hook == null) continue;
 
 				hook.Type = type;
-				Hooks.Add(hook);
+				CoreHooks.Add(hook);
 			}
 
 			GetRootFolder();

@@ -14,6 +14,7 @@ using System.Reflection;
 using Carbon.Base.Interfaces;
 using Carbon.Core;
 using Carbon.Extensions;
+using Carbon.Hooks;
 using Carbon.Processors;
 using Newtonsoft.Json;
 using Oxide.Core;
@@ -242,36 +243,32 @@ namespace Carbon
 			#endregion
 
 			LoadConfig();
-
 			Carbon.FileLogger._init();
-
 			Carbon.Logger.Log("Loaded config");
 
 			Carbon.Logger.Log($"Loading...");
+			{
+				Defines.Initialize();
 
-			Defines.Initialize();
+				_installProcessors();
 
-			_installProcessors();
+				Interface.Initialize();
 
-			Interface.Initialize();
+				_clearCommands();
+				_installDefaultCommands();
 
-			_clearCommands();
-			_installDefaultCommands();
+				HookValidator.Refresh();
+				Carbon.Logger.Log("Fetched oxide hooks");
 
-			HookValidator.Refresh();
-			Carbon.Logger.Log("Fetched oxide hooks");
+				RefreshConsoleInfo();
 
-			ReloadPlugins();
-
+				IsInitialized = true;
+			}
 			Carbon.Logger.Log($"Loaded.");
-
-			RefreshConsoleInfo();
-
-			IsInitialized = true;
 
 			Entities.Init();
 
-			HookProcessor.InstallAlwaysPatchedHooks();
+			HookLoader.DownloadHooks(onDownloaded: ReloadPlugins);
 		}
 		public void Uninitalize()
 		{

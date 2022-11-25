@@ -21,9 +21,16 @@ namespace Carbon.Processors
 
 		public bool DoesHookExist(string hookName)
 		{
+			if (Defines.CoreHooks == null || Defines.DynamicHooks == null) return false;
+
 			using (TimeMeasure.New($"DoesHookExist: {hookName}"))
 			{
-				foreach (var hook in Defines.Hooks)
+				foreach (var hook in Defines.CoreHooks)
+				{
+					if (hook.Name == hookName) return true;
+				}
+
+				foreach (var hook in Defines.DynamicHooks)
 				{
 					if (hook.Name == hookName) return true;
 				}
@@ -146,13 +153,19 @@ namespace Carbon.Processors
 
 		public void InstallAlwaysPatchedHooks()
 		{
-			foreach (var type in Defines.Carbon.GetTypes())
+			var hooks = Pool.GetList<Hook>();
+
+			hooks.AddRange(Defines.CoreHooks);
+			hooks.AddRange(Defines.DynamicHooks);
+
+			foreach (var hook in hooks)
 			{
-				var hook = type.GetCustomAttribute<Hook>();
-				if (hook == null || type.GetCustomAttribute<Hook.AlwaysPatched>() == null) continue;
+				if (hook == null || hook.Type.GetCustomAttribute<Hook.AlwaysPatched>() == null) continue;
 
 				InstallHooks(hook.Name, true, true);
 			}
+
+			Pool.FreeList(ref hooks);
 		}
 
 		internal Type[] GetMatchedParameters(Type type, string methodName, ParameterInfo[] parameters)
