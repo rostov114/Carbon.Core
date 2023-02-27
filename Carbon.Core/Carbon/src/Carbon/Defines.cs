@@ -162,7 +162,7 @@ public class Defines
 		"System.Xml",
 		"System",
 
-		"0Harmony", // v2
+		// "0Harmony", // v2
 
 		"Carbon",
 		"Carbon.Common",
