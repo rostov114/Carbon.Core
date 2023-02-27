@@ -11,7 +11,6 @@ using Carbon.Base;
 using Carbon.Core;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 /*
  *
@@ -82,19 +81,24 @@ public class ScriptCompilationThread : BaseThreadedJob
 		}
 	}
 
+	internal void _injectReference(string id, string name, List<MetadataReference> references)
+	{
+		Logger.Debug(id, $"Added common reference '{name}'", 4);
+		var raw = Supervisor.ASM.ReadAssembly(name);
+		using (MemoryStream mem = new MemoryStream(raw))
+			references.Add(MetadataReference.CreateFromStream(mem));
+	}
+
 	internal List<MetadataReference> _addReferences()
 	{
 		var references = new List<MetadataReference>();
-		string id = Path.GetFileNameWithoutExtension(FilePath);
+		var id = Path.GetFileNameWithoutExtension(FilePath);
 
-		foreach (string item in Defines.ReferenceList)
+		foreach (var item in Defines.ReferenceList)
 		{
 			try
 			{
-				Logger.Debug(id, $"Added common reference '{item}'", 4);
-				byte[] raw = Supervisor.ASM.ReadAssembly(item);
-				using (MemoryStream mem = new MemoryStream(raw))
-					references.Add(MetadataReference.CreateFromStream(mem));
+				_injectReference(id, item, references);
 			}
 			catch (System.Exception)
 			{
@@ -102,8 +106,13 @@ public class ScriptCompilationThread : BaseThreadedJob
 			}
 		}
 
+		if (Community.Runtime.Config.HarmonyReference)
+		{
+			_injectReference(id, "0Harmony", references);
+		}
+
 		// goes through the requested use list by the plugin
-		foreach (string element in Usings)
+		foreach (var element in Usings)
 		{
 			try
 			{
@@ -118,7 +127,7 @@ public class ScriptCompilationThread : BaseThreadedJob
 		}
 
 		// goes through the requested references by the plugin
-		foreach (string reference in References)
+		foreach (var reference in References)
 		{
 			try
 			{
