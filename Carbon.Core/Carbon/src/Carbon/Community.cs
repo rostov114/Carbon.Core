@@ -141,7 +141,6 @@ public class Community
 	public CarbonProcessor CarbonProcessor { get; set; }
 	public ScriptProcessor ScriptProcessor { get; set; }
 	public WebScriptProcessor WebScriptProcessor { get; set; }
-	public HarmonyProcessor HarmonyProcessor { get; set; }
 	public ModuleProcessor ModuleProcessor { get; set; }
 	public HookManager HookManager { get; set; }
 
@@ -151,7 +150,6 @@ public class Community
 
 		if (ScriptProcessor == null ||
 			WebScriptProcessor == null ||
-			HarmonyProcessor == null ||
 			HookManager == null ||
 			ModuleProcessor == null ||
 			CarbonProcessor)
@@ -161,7 +159,6 @@ public class Community
 			var gameObject = new GameObject("Processors");
 			ScriptProcessor = gameObject.AddComponent<ScriptProcessor>();
 			WebScriptProcessor = gameObject.AddComponent<WebScriptProcessor>();
-			HarmonyProcessor = gameObject.AddComponent<HarmonyProcessor>();
 			CarbonProcessor = gameObject.AddComponent<CarbonProcessor>();
 			HookManager = gameObject.AddComponent<HookManager>();
 			ModuleProcessor = new ModuleProcessor();
@@ -174,7 +171,6 @@ public class Community
 	{
 		if (ScriptProcessor != null) ScriptProcessor?.Start();
 		if (WebScriptProcessor != null) WebScriptProcessor?.Start();
-		if (HarmonyProcessor != null) HarmonyProcessor?.Start();
 
 		if (ScriptProcessor != null) ScriptProcessor.InvokeRepeating(() => { RefreshConsoleInfo(); }, 1f, 1f);
 		Carbon.Logger.Log("Registered processors");
@@ -187,7 +183,6 @@ public class Community
 		{
 			if (ScriptProcessor != null) ScriptProcessor?.Dispose();
 			if (WebScriptProcessor != null) WebScriptProcessor?.Dispose();
-			if (HarmonyProcessor != null) HarmonyProcessor?.Dispose();
 			if (ModuleProcessor != null) ModuleProcessor?.Dispose();
 			if (CarbonProcessor != null) CarbonProcessor?.Dispose();
 		}
@@ -197,7 +192,6 @@ public class Community
 		{
 			if (ScriptProcessor != null) UnityEngine.Object.DestroyImmediate(ScriptProcessor);
 			if (WebScriptProcessor != null) UnityEngine.Object.DestroyImmediate(WebScriptProcessor);
-			if (HarmonyProcessor != null) UnityEngine.Object.DestroyImmediate(HarmonyProcessor);
 			if (CarbonProcessor != null) UnityEngine.Object.DestroyImmediate(CarbonProcessor);
 			if (HookManager != null) UnityEngine.Object.DestroyImmediate(HookManager);
 		}
@@ -232,7 +226,6 @@ public class Community
 		Loader.ClearAllErrored();
 		Loader.ClearAllRequirees();
 
-		Loader.LoadCarbonMods();
 		ScriptLoader.LoadAll();
 	}
 	public static void ClearPlugins()

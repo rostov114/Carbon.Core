@@ -800,10 +800,7 @@ public class CorePlugin : CarbonPlugin
 
 				if (!string.IsNullOrEmpty(path))
 				{
-					Community.Runtime.HarmonyProcessor.ClearIgnore(path);
 					Community.Runtime.ScriptProcessor.ClearIgnore(path);
-
-					Community.Runtime.HarmonyProcessor.Prepare(name, path);
 					Community.Runtime.ScriptProcessor.Prepare(name, path);
 					return;
 				}
@@ -841,21 +838,6 @@ public class CorePlugin : CarbonPlugin
 		{
 			case "*":
 				//
-				// Mods
-				//
-				{
-					var tempList = Pool.GetList<string>();
-					tempList.AddRange(Community.Runtime.HarmonyProcessor.IgnoreList);
-					Community.Runtime.HarmonyProcessor.IgnoreList.Clear();
-
-					foreach (var plugin in tempList)
-					{
-						Community.Runtime.HarmonyProcessor.Prepare(plugin, plugin);
-					}
-					Pool.FreeList(ref tempList);
-				}
-
-				//
 				// Scripts
 				//
 				{
@@ -875,10 +857,7 @@ public class CorePlugin : CarbonPlugin
 				var path = GetPluginPath(name);
 				if (!string.IsNullOrEmpty(path))
 				{
-					Community.Runtime.HarmonyProcessor.ClearIgnore(path);
 					Community.Runtime.ScriptProcessor.ClearIgnore(path);
-
-					Community.Runtime.HarmonyProcessor.Prepare(path);
 					Community.Runtime.ScriptProcessor.Prepare(path);
 					return;
 				}
@@ -907,17 +886,6 @@ public class CorePlugin : CarbonPlugin
 		switch (name)
 		{
 			case "*":
-				//
-				// Mods
-				//
-				{
-					foreach (var plugin in Community.Runtime.HarmonyProcessor.InstanceBuffer)
-					{
-						Community.Runtime.HarmonyProcessor.Ignore(plugin.Value.File);
-					}
-					Community.Runtime.HarmonyProcessor.Clear();
-				}
-
 				//
 				// Scripts
 				//
@@ -955,7 +923,6 @@ public class CorePlugin : CarbonPlugin
 				var path = GetPluginPath(name);
 				if (!string.IsNullOrEmpty(path))
 				{
-					Community.Runtime.HarmonyProcessor.Ignore(path);
 					Community.Runtime.ScriptProcessor.Ignore(path);
 					Community.Runtime.WebScriptProcessor.Ignore(path);
 				}

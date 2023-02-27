@@ -78,13 +78,11 @@ public class OxideMod
 	{
 		var path = CorePlugin.GetPluginPath(name);
 
-		Community.Runtime.HarmonyProcessor.Prepare(name, path);
 		Community.Runtime.ScriptProcessor.Prepare(name, path);
 	}
 
 	public void UnloadPlugin(string name)
 	{
-		Community.Runtime.HarmonyProcessor.Remove(name);
 		Community.Runtime.ScriptProcessor.Remove(name);
 	}
 

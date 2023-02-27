@@ -25,7 +25,6 @@ public class Defines
 		GetModulesFolder();
 		GetDataFolder();
 		GetScriptFolder();
-		GetHarmonyFolder();
 		GetLogsFolder();
 		GetLangFolder();
 		GetReportsFolder();
@@ -37,7 +36,6 @@ public class Defines
 
 	internal static string _customRootFolder;
 	internal static string _customScriptFolder;
-	internal static string _customHarmonyFolder;
 	internal static string _customConfigFolder;
 	internal static string _customDataFolder;
 	internal static string _customModuleFolder;
@@ -46,7 +44,6 @@ public class Defines
 	{
 		_customRootFolder = CommandLineEx.GetArgumentResult("-carbon.rootdir");
 		_customScriptFolder = CommandLineEx.GetArgumentResult("-carbon.scriptdir");
-		_customHarmonyFolder = CommandLineEx.GetArgumentResult("-carbon.harmonydir");
 		_customConfigFolder = CommandLineEx.GetArgumentResult("-carbon.configdir");
 		_customDataFolder = CommandLineEx.GetArgumentResult("-carbon.datadir");
 		_customModuleFolder = CommandLineEx.GetArgumentResult("-carbon.moduledir");
@@ -88,13 +85,6 @@ public class Defines
 	public static string GetScriptFolder()
 	{
 		var folder = Path.GetFullPath(string.IsNullOrEmpty(_customScriptFolder) ? Path.Combine(GetRootFolder(), "plugins") : _customScriptFolder);
-		Directory.CreateDirectory(folder);
-
-		return folder;
-	}
-	public static string GetHarmonyFolder()
-	{
-		var folder = Path.GetFullPath(string.IsNullOrEmpty(_customHarmonyFolder) ? Path.Combine(GetRootFolder(), "harmony") : _customHarmonyFolder);
 		Directory.CreateDirectory(folder);
 
 		return folder;
@@ -187,7 +177,7 @@ public class Defines
 		"Newtonsoft.Json",
 		"Rust.Data",
 		"Rust.Global",
-		"Rust.Harmony",
+		// "Rust.Harmony",
 		"Rust.Localization",
 		"Rust.Platform",
 		"Rust.Platform.Common",
