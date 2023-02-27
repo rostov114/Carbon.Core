@@ -8,8 +8,6 @@ using Carbon.Core;
 using Carbon.Processors;
 using Facepunch;
 using Newtonsoft.Json;
-using Oxide.Core;
-using Oxide.Core.Plugins;
 
 /*
  *
@@ -60,8 +58,6 @@ namespace Oxide.Plugins
 		internal Loader.CarbonMod _carbon;
 		internal BaseProcessor _processor;
 		internal BaseProcessor.Instance _processor_instance;
-
-		public object Harmony;
 
 		public static implicit operator bool(Plugin other)
 		{
@@ -215,25 +211,6 @@ namespace Oxide.Plugins
 				else plugin = Community.Runtime.CorePlugin.plugins.Find(name);
 
 				if (plugin != null) field.SetValue(this, plugin);
-			}
-		}
-
-		public void PatchPlugin(Assembly assembly = null)
-		{
-			UnpatchPlugin();
-
-			if (assembly == null) assembly = Assembly.GetExecutingAssembly();
-
-			var patch = new HarmonyLib.Harmony(Name + "Patches");
-			patch.PatchAll(assembly);
-			Harmony = patch;
-		}
-		public void UnpatchPlugin()
-		{
-			if (Harmony is HarmonyLib.Harmony patch)
-			{
-				patch?.UnpatchAll(patch.Id);
-				Harmony = null;
 			}
 		}
 
