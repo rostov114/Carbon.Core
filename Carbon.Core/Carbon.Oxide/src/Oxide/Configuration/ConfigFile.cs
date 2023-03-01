@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace Oxide.Core.Configuration;
 
-public abstract class ConfigFile
+public abstract class ConfigFile : Carbon.Plugins.Configuration.ConfigFile
 {
 	[JsonIgnore]
 	public string Filename { get; private set; }

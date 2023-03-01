@@ -51,8 +51,7 @@ namespace Carbon.Plugins
 			base.TrackEnd();
 		}
 
-		public Plugin[] Requires { get; set; }
-
+		internal Plugin[] _requires;
 		internal Loader.CarbonMod _carbon;
 		internal IBaseProcessor _processor;
 
@@ -61,7 +60,7 @@ namespace Carbon.Plugins
 			return other != null;
 		}
 
-		public virtual void IInit()
+		internal virtual void IInit()
 		{
 			if (HookMethods != null)
 			{
@@ -83,7 +82,7 @@ namespace Carbon.Plugins
 
 			using (TimeMeasure.New($"Processing PluginReferences on '{this}'"))
 			{
-				InternalApplyPluginReferences();
+				_applyPluginReferences();
 			}
 			Logger.Debug(Name, "Assigned plugin references");
 
@@ -164,7 +163,7 @@ namespace Carbon.Plugins
 
 					foreach (var plugin in plugins)
 					{
-						if (plugin.Requires != null && plugin.Requires.Contains(this))
+						if (plugin._requires != null && plugin._requires.Contains(this))
 						{
 							switch (plugin._processor)
 							{
@@ -182,7 +181,7 @@ namespace Carbon.Plugins
 				Pool.FreeList(ref plugins);
 			}
 		}
-		internal void InternalApplyPluginReferences()
+		internal void _applyPluginReferences()
 		{
 			if (PluginReferences == null) return;
 

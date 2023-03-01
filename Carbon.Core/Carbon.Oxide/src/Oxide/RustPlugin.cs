@@ -100,33 +100,6 @@ public class RustPlugin : CarbonPlugin
 	public void Puts(object message, params object[] args)
 		=> Carbon.Logger.Log($"[{Name}] {(args == null ? message : string.Format(message.ToString(), args))}");
 
-	public void Log(object message) => Carbon.Logger.Log($"[{Name}] {message}");
-
-	/// <summary>
-	/// Outputs to the game's console a message with severity level 'WARNING'.
-	/// NOTE: Oxide compatibility layer.
-	/// </summary>
-	/// <param name="message"></param>
-	public void LogWarning(object message)
-		=> Carbon.Logger.Warn($"[{Name}] {message}");
-
-	/// <summary>
-	/// Outputs to the game's console a message with severity level 'ERROR'.
-	/// NOTE: Oxide compatibility layer.
-	/// </summary>
-	/// <param name="message"></param>
-	/// <param name="ex"></param>
-	public void LogError(object message, Exception ex)
-		=> Carbon.Logger.Error($"[{Name}] {message}", ex);
-
-	/// <summary>
-	/// Outputs to the game's console a message with severity level 'ERROR'.
-	/// NOTE: Oxide compatibility layer.
-	/// </summary>
-	/// <param name="message"></param>
-	public void LogError(object message)
-		=> Carbon.Logger.Error($"[{Name}] {message}", null);
-
 	/// <summary>
 	/// Outputs to the game's console a message with severity level 'WARNING'.
 	/// NOTE: Oxide compatibility layer.
@@ -188,33 +161,6 @@ public class RustPlugin : CarbonPlugin
 
 	#endregion
 
-	public void ILoadConfig()
-	{
-		LoadConfig();
-	}
-	public void ILoadDefaultMessages()
-	{
-		CallHook("LoadDefaultMessages");
-	}
-
-	protected virtual void LoadConfig()
-	{
-		Config = new DynamicConfigFile(Path.Combine(Manager.ConfigPath, Name + ".json"));
-
-		if (!Config.Exists(null))
-		{
-			LoadDefaultConfig();
-			SaveConfig();
-		}
-		try
-		{
-			Config.Load(null);
-		}
-		catch (Exception ex)
-		{
-			Carbon.Logger.Error("Failed to load config file (is the config file corrupt?) (" + ex.Message + ")");
-		}
-	}
 	protected virtual void LoadDefaultConfig()
 	{
 

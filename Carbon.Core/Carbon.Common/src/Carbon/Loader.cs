@@ -433,7 +433,7 @@ public static class Loader
 			{
 				foreach (var plugin in mod.Plugins)
 				{
-					try { plugin.InternalApplyPluginReferences(); } catch { }
+					try { plugin._applyPluginReferences(); } catch { }
 				}
 			}
 

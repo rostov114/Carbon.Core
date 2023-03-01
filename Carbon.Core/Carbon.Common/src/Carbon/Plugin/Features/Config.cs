@@ -5,13 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Carbon.Plugins.Configuration
+namespace Carbon.Plugins.Features
 {
-	public abstract class ConfigFile
+	public abstract class Config
 	{
 		[JsonIgnore]
 		public string Name { get; private set; }
 
-		protected ConfigFile(string name) { Name = name; }
+		protected Config(string name)
+		{
+			Name = name;
+		}
 	}
 }

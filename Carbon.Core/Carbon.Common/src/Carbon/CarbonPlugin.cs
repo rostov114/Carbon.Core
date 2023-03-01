@@ -1,6 +1,7 @@
 ﻿using System;
 using Carbon.Components;
 using Carbon.Core;
+using Network.Visibility;
 using Oxide.Core;
 
 /*
@@ -48,6 +49,38 @@ public class CarbonPlugin : Plugin
 	public void LogWarning(object message) => Logger.Warn($"[{Name}] {message}");
 	public void LogError(object message, Exception ex) => Logger.Error($"[{Name}] {message}", ex);
 	public void LogError(object message) => Logger.Error($"[{Name}] {message}", null);
+
+	#endregion
+
+	protected virtual void LoadConfig()
+	{
+		Config = new DynamicConfigFile(Path.Combine(Manager.ConfigPath, Name + ".json"));
+
+		if (!Config.Exists(null))
+		{
+			LoadDefaultConfig();
+			SaveConfig();
+		}
+		try
+		{
+			Config.Load(null);
+		}
+		catch (Exception ex)
+		{
+			Carbon.Logger.Error("Failed to load config file (is the config file corrupt?) (" + ex.Message + ")");
+		}
+	}
+
+	#region Internals
+
+	public void ILoadConfig()
+	{
+		LoadConfig();
+	}
+	public void ILoadDefaultMessages()
+	{
+		CallHook("LoadDefaultMessages");
+	}
 
 	#endregion
 }

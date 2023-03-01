@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" DefaultTargets="Build">
 	<PropertyGroup>
-		<Product>Carbon.Voldemort</Product>
+		<Product>Carbon.Oxide</Product>
 		<OutputType>Library</OutputType>
 	</PropertyGroup>
 
