@@ -40,7 +40,7 @@ public struct TimeMeasure : IDisposable
 
 		if (Mathf.Abs(Environment.TickCount - num) >= _miliseconds)
 		{
-			Carbon.Logger.Warn(
+			Logger.Warn(
 				$" {_name} took {num:0}ms [abv {_miliseconds}]{(string.IsNullOrEmpty(_warn) ? "" : (": " + _warn))}");
 		}
 #endif

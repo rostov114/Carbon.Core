@@ -160,7 +160,7 @@ public class ColorPickerModule : CarbonModule<ColorPickerConfig, ColorPickerData
 	}
 	internal void DrawColor(CUI cui, CuiElementContainer container, float scale, Color color, string parent, float xOffset, float yOffset, string mode = "color", float fade = 0f, int index = -1)
 	{
-		var size = Carbon.Extensions.MathEx.Scale(1f, 0, scale, 0f, 1f);
+		var size = Extensions.MathEx.Scale(1f, 0, scale, 0f, 1f);
 
 		var id = cui.CreateProtectedButton(container, parent, null,
 			color: $"{color.r} {color.g} {color.b} 1",

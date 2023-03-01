@@ -1,4 +1,5 @@
-﻿using Carbon.Components;
+﻿using System;
+using Carbon.Components;
 using Carbon.Core;
 using Oxide.Core;
 
@@ -38,6 +39,15 @@ public class CarbonPlugin : Plugin
 	{
 		return new CUI(CuiHandler);
 	}
+
+	#endregion
+
+	#region Logging
+
+	public void Log(object message) => Logger.Log($"[{Name}] {message}");
+	public void LogWarning(object message) => Logger.Warn($"[{Name}] {message}");
+	public void LogError(object message, Exception ex) => Logger.Error($"[{Name}] {message}", ex);
+	public void LogError(object message) => Logger.Error($"[{Name}] {message}", null);
 
 	#endregion
 }

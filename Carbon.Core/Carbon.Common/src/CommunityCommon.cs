@@ -203,7 +203,7 @@ public class Community
 	{
 		if (player == null)
 		{
-			Carbon.Logger.Log(message);
+			Logger.Log(message);
 			return;
 		}
 

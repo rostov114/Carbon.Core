@@ -21,7 +21,7 @@ public class HookValidator
 	public static void Initialize()
 	{
 		Community.Runtime.Events.Subscribe(
-			CarbonEvent.HooksInstalled, x => HookValidator.Refresh());
+			CarbonEvent.HooksInstalled, x => Refresh());
 	}
 
 	public static async void Refresh()

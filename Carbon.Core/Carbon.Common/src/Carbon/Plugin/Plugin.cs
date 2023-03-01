@@ -17,12 +17,13 @@ using Newtonsoft.Json;
  *
  */
 
-namespace Carbon
+namespace Carbon.Plugins
 {
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Plugin : BaseHookable, IDisposable
 	{
 		public bool IsCorePlugin { get; set; }
+		public bool HasConditionals { get; set; }
 
 		[JsonProperty]
 		public string Title { get; set; } = "Rust";
@@ -30,10 +31,6 @@ namespace Carbon
 		public string Description { get; set; }
 		[JsonProperty]
 		public string Author { get; set; }
-		public int ResourceId { get; set; }
-		public bool HasConfig { get; set; }
-		public bool HasMessages { get; set; }
-		public bool HasConditionals { get; set; }
 
 		[JsonProperty]
 		public double CompileTime { get; set; }
@@ -57,8 +54,7 @@ namespace Carbon
 		public Plugin[] Requires { get; set; }
 
 		internal Loader.CarbonMod _carbon;
-		public IBaseProcessor _processor;
-		public IBaseProcessor.IInstance _processor_instance;
+		internal IBaseProcessor _processor;
 
 		public static implicit operator bool(Plugin other)
 		{
@@ -82,14 +78,14 @@ namespace Carbon
 						else list.Add(method);
 					}
 				}
-				Carbon.Logger.Debug(Name, "Installed hook method attributes");
+				Logger.Debug(Name, "Installed hook method attributes");
 			}
 
 			using (TimeMeasure.New($"Processing PluginReferences on '{this}'"))
 			{
 				InternalApplyPluginReferences();
 			}
-			Carbon.Logger.Debug(Name, "Assigned plugin references");
+			Logger.Debug(Name, "Assigned plugin references");
 
 			if (Hooks != null)
 			{
@@ -99,7 +95,7 @@ namespace Carbon
 					foreach (var hook in Hooks)
 						Community.Runtime.HookManager.Subscribe(hook, requester);
 				}
-				Carbon.Logger.Debug(Name, "Processed hooks");
+				Logger.Debug(Name, "Processed hooks");
 			}
 
 			CallHook("Init");
@@ -135,7 +131,7 @@ namespace Carbon
 			{
 				foreach (var hook in Hooks)
 					Community.Runtime.HookManager.Unsubscribe(hook, FileName);
-				Carbon.Logger.Debug(Name, $"Unprocessed hooks");
+				Logger.Debug(Name, $"Unprocessed hooks");
 			}
 
 			using (TimeMeasure.New($"IUnload.Disposal on '{this}'"))
@@ -204,7 +200,7 @@ namespace Carbon
 					var info = field.FieldType.GetCustomAttribute<InfoAttribute>();
 					if (info == null)
 					{
-						Carbon.Logger.Warn($"You're trying to reference a non-plugin instance: {name}[{field.FieldType.Name}]");
+						Logger.Warn($"You're trying to reference a non-plugin instance: {name}[{field.FieldType.Name}]");
 						continue;
 					}
 

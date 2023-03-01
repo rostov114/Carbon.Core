@@ -69,7 +69,7 @@ namespace Carbon
 				var result = Caller.CallHook(module, hookName, flags: flag, args: args);
 				if (result != null && objectOverride != null)
 				{
-					Carbon.Logger.Warn($"Hook '{hookName}' conflicts with {hookableOverride.Name}");
+					Logger.Warn($"Hook '{hookName}' conflicts with {hookableOverride.Name}");
 					break;
 				}
 
@@ -91,7 +91,7 @@ namespace Carbon
 						var result = Caller.CallHook(plugin, hookName, flags: flag, args: array);
 						if (result != null && objectOverride != null)
 						{
-							Carbon.Logger.Warn($"Hook '{hookName}' conflicts with {hookableOverride.Name}");
+							Logger.Warn($"Hook '{hookName}' conflicts with {hookableOverride.Name}");
 							break;
 						}
 
@@ -122,7 +122,7 @@ namespace Carbon
 			{
 				Caller._lastDeprecatedWarningAt[oldHook] = now;
 
-				Carbon.Logger.Warn($"A plugin is using deprecated hook '{oldHook}', which will stop working on {expireDate.ToString("D")}. Please ask the author to update to '{newHook}'");
+				Logger.Warn($"A plugin is using deprecated hook '{oldHook}', which will stop working on {expireDate.ToString("D")}. Please ask the author to update to '{newHook}'");
 			}
 
 			return CallStaticHook(oldHook, flag, args);

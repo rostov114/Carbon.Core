@@ -1567,7 +1567,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 	}
 	public class PlayersTab
 	{
-		internal static AdminModule Admin => BaseModule.GetModule<AdminModule>();
+		internal static AdminModule Admin => GetModule<AdminModule>();
 
 		public static Tab Get()
 		{
@@ -1685,7 +1685,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 				tab.AddInput(0, "Mods", () => $"{Community.Runtime.Plugins.Plugins.Count:n0}", null);
 
 				tab.AddName(0, "Console", TextAnchor.MiddleLeft);
-				tab.AddInput(0, "Execute Server Command", null, (ap, args) => { ConsoleSystem.Run(ConsoleSystem.Option.Server, args[0], args.Skip(1).ToArray()); });
+				tab.AddInput(0, "Execute Server Command", null, (ap, args) => { Run(Option.Server, args[0], args.Skip(1).ToArray()); });
 			}
 
 			tab.AddName(1, "Config", TextAnchor.MiddleLeft);

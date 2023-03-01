@@ -100,13 +100,7 @@ public class RustPlugin : CarbonPlugin
 	public void Puts(object message, params object[] args)
 		=> Carbon.Logger.Log($"[{Name}] {(args == null ? message : string.Format(message.ToString(), args))}");
 
-	/// <summary>
-	/// Outputs to the game's console a message with severity level 'NOTICE'.
-	/// NOTE: Oxide compatibility layer.
-	/// </summary>
-	/// <param name="message"></param>
-	public void Log(object message)
-		=> Carbon.Logger.Log($"[{Name}] {message}");
+	public void Log(object message) => Carbon.Logger.Log($"[{Name}] {message}");
 
 	/// <summary>
 	/// Outputs to the game's console a message with severity level 'WARNING'.
@@ -223,7 +217,7 @@ public class RustPlugin : CarbonPlugin
 	}
 	protected virtual void LoadDefaultConfig()
 	{
-		//CallHook ( "LoadDefaultConfig" );
+
 	}
 	protected virtual void SaveConfig()
 	{

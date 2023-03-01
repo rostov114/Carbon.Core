@@ -101,7 +101,7 @@ public class CorePlugin : CarbonPlugin
 	private void IOnPlayerConnected(BasePlayer player)
 	{
 		permission.RefreshUser(player);
-		Interface.CallHook("OnPlayerConnected", player);
+		HookCaller.CallStaticHook("OnPlayerConnected", player);
 	}
 	private object IOnUserApprove(Connection connection)
 	{
@@ -110,8 +110,8 @@ public class CorePlugin : CarbonPlugin
 		var obj = Regex.Replace(connection.ipaddress, global::Oxide.Game.Rust.Libraries.Player.ipPattern, "");
 		var authLevel = connection.authLevel;
 
-		var canClient = Interface.CallHook("CanClientLogin", connection);
-		var canUser = Interface.CallHook("CanUserLogin", username, text, obj);
+		var canClient = HookCaller.CallStaticHook("CanClientLogin", connection);
+		var canUser = HookCaller.CallStaticHook("CanUserLogin", username, text, obj);
 
 		var obj4 = (canClient == null) ? canUser : canClient;
 		if (obj4 is string || (obj4 is bool && !(bool)obj4))
@@ -120,8 +120,8 @@ public class CorePlugin : CarbonPlugin
 			return true;
 		}
 
-		if (Interface.CallHook("OnUserApprove", connection) != null)
-			return Interface.CallHook("OnUserApproved", username, text, obj);
+		if (HookCaller.CallStaticHook("OnUserApprove", connection) != null)
+			return HookCaller.CallStaticHook("OnUserApproved", username, text, obj);
 
 		return null;
 	}
@@ -274,7 +274,7 @@ public class CorePlugin : CarbonPlugin
 	{
 		if (!arg.IsPlayerCalledAndAdmin()) return;
 
-		Carbon.Core.Updater.DoUpdate((bool result) =>
+		Updater.DoUpdate((bool result) =>
 		{
 			if (!result)
 			{

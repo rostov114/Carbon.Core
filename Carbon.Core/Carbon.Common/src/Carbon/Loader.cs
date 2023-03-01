@@ -8,6 +8,7 @@ using API.Events;
 using Carbon.Base;
 using Carbon.Components;
 using Carbon.Extensions;
+using Carbon.Plugins;
 using Newtonsoft.Json;
 using Oxide.Plugins;
 
@@ -561,7 +562,7 @@ public static class Loader
 		public List<IHarmonyMod> Hooks { get; } = new List<IHarmonyMod>();
 
 		[JsonProperty]
-		public List<RustPlugin> Plugins { get; set; } = new List<RustPlugin>();
+		public List<CarbonPlugin> Plugins { get; set; } = new List<CarbonPlugin>();
 	}
 
 	[JsonObject(MemberSerialization.OptIn)]

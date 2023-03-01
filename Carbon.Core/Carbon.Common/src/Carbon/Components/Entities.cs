@@ -26,7 +26,7 @@ public class Entities : IDisposable
 				Mapping.Add(type, new List<BaseEntity>(Community.Runtime.Config.EntityMapBufferSize));
 			}
 
-			Carbon.Logger.Warn($"Mapping {BaseNetworkable.serverEntities.Count:n0} entities... This will take a while.");
+			Logger.Warn($"Mapping {BaseNetworkable.serverEntities.Count:n0} entities... This will take a while.");
 
 			using (TimeMeasure.New("Entity mapping"))
 			{
@@ -42,9 +42,9 @@ public class Entities : IDisposable
 				}
 			}
 
-			Carbon.Logger.Warn($"Done mapping.");
+			Logger.Warn($"Done mapping.");
 		}
-		catch (Exception ex) { Carbon.Logger.Error($"Failed Entities.Init()", ex); }
+		catch (Exception ex) { Logger.Error($"Failed Entities.Init()", ex); }
 	}
 
 	public void Dispose()
@@ -71,7 +71,7 @@ public class Entities : IDisposable
 	{
 		var map = new Map<T>
 		{
-			Pool = Facepunch.Pool.GetList<T>()
+			Pool = Pool.GetList<T>()
 		};
 
 		if (inherited)
@@ -163,7 +163,7 @@ public class Entities : IDisposable
 
 		public void Dispose()
 		{
-			Carbon.Logger.Warn($"Cleaned {typeof(T).Name}");
+			Logger.Warn($"Cleaned {typeof(T).Name}");
 			Facepunch.Pool.FreeList(ref Pool);
 		}
 	}
