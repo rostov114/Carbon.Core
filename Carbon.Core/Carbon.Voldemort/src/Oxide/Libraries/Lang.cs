@@ -5,6 +5,7 @@ using Carbon.Extensions;
 using Carbon.Core;
 using Newtonsoft.Json;
 using Oxide.Plugins;
+using Plugin = Carbon.Plugin;
 
 /*
  *

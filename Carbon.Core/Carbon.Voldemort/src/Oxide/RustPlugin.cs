@@ -7,6 +7,7 @@ using Oxide.Core.Configuration;
 using Oxide.Core.Libraries;
 using Oxide.Game.Rust.Libraries;
 using UnityEngine;
+using Carbon.Plugins;
 
 /*
  *
@@ -17,7 +18,7 @@ using UnityEngine;
 
 namespace Oxide.Plugins;
 
-public class RustPlugin : Plugin
+public class RustPlugin : CarbonPlugin
 {
 	public PluginManager Manager { get; set; }
 
@@ -43,17 +44,9 @@ public class RustPlugin : Plugin
 		Setup($"Core Plugin {RandomEx.GetRandomString(5)}", "Carbon Community", new VersionNumber(1, 0, 0), string.Empty);
 	}
 
-	public virtual void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description)
+	public override void Setup(string name, string author, VersionNumber version, string description)
 	{
-		_carbon = mod;
-		Setup(name, author, version, description);
-	}
-	public virtual void Setup(string name, string author, VersionNumber version, string description)
-	{
-		Name = name;
-		Version = version;
-		Author = author;
-		Description = description;
+		base.Setup(name, author, version, description);
 
 		permission = Interface.Oxide.Permission;
 		cmd = new Command();
@@ -69,10 +62,9 @@ public class RustPlugin : Plugin
 		UnityEngine.Object.DontDestroyOnLoad(persistence.gameObject);
 		covalence = new CovalencePlugin.Covalence();
 
-		Type = GetType();
-
 		mod.Load();
 	}
+
 	public override void Dispose()
 	{
 		permission.UnregisterPermissions(this);

@@ -1,6 +1,6 @@
 ﻿using Carbon.Components;
+using Carbon.Core;
 using Oxide.Core;
-using Oxide.Plugins;
 
 /*
  *
@@ -11,13 +11,23 @@ using Oxide.Plugins;
 
 namespace Carbon.Plugins;
 
-public class CarbonPlugin : RustPlugin
+public class CarbonPlugin : Plugin
 {
 	public CUI.Handler CuiHandler { get; set; }
 
-	public override void Setup(string name, string author, VersionNumber version, string description)
+	public virtual void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description)
 	{
-		base.Setup(name, author, version, description);
+		_carbon = mod;
+		Setup(name, author, version, description);
+	}
+	public virtual void Setup(string name, string author, VersionNumber version, string description)
+	{
+		Name = name;
+		Version = version;
+		Author = author;
+		Description = description;
+
+		Type = GetType();
 
 		CuiHandler = new CUI.Handler();
 	}

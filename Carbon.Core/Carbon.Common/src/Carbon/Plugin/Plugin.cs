@@ -17,7 +17,7 @@ using Newtonsoft.Json;
  *
  */
 
-namespace Oxide.Plugins
+namespace Carbon
 {
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Plugin : BaseHookable, IDisposable

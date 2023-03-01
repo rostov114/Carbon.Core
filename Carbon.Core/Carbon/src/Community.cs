@@ -191,6 +191,8 @@ public class CommunityInternal : Community
 		"System",
 
 		"Carbon.Common",
+		"Carbon.Voldemort",
+
 		"protobuf-net",
 		"protobuf-net.Core",
 

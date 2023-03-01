@@ -6,6 +6,7 @@ using System.Reflection;
 using Carbon;
 using Oxide.Game.Rust.Libraries.Covalence;
 using Oxide.Plugins;
+using Plugin = Carbon.Plugin;
 
 /*
  *
