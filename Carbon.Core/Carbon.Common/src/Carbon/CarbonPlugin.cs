@@ -1,8 +1,16 @@
 ﻿using System;
+using Carbon.Base;
+using System.Linq;
+using System.Reflection;
+using System.Runtime.Serialization;
 using Carbon.Components;
 using Carbon.Core;
-using Network.Visibility;
 using Oxide.Core;
+using static ConsoleSystem;
+using Facepunch;
+using Command = Carbon.Components.Command;
+using System.IO;
+using Carbon.Plugins.Features;
 
 /*
  *
@@ -52,9 +60,13 @@ public class CarbonPlugin : Plugin
 
 	#endregion
 
+	#region Config
+
+	public CarbonConfig Config { get; private set; }
+
 	protected virtual void LoadConfig()
 	{
-		Config = new DynamicConfigFile(Path.Combine(Manager.ConfigPath, Name + ".json"));
+		Config = new Config(Path.Combine(Defines.GetConfigsFolder(), Name + ".json"));
 
 		if (!Config.Exists(null))
 		{
@@ -70,6 +82,205 @@ public class CarbonPlugin : Plugin
 			Carbon.Logger.Error("Failed to load config file (is the config file corrupt?) (" + ex.Message + ")");
 		}
 	}
+
+	#endregion
+
+	#region Command
+
+	public static bool FromRcon { get; set; }
+
+	public void AddChatCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		if (Community.Runtime.AllChatCommands.Count(x => x.Name == name) == 0)
+		{
+			Community.Runtime.AllChatCommands.Add(new Command
+			{
+				Name = name,
+				Plugin = plugin,
+				SkipOriginal = skipOriginal,
+				Callback = (player, cmd, args) =>
+				{
+					try { callback.Invoke(player, cmd, args); }
+					catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin ) carbonPlugin.LogError ( "Error", ex.InnerException ?? ex ); }
+				},
+				Help = help,
+				Reference = reference,
+				Permissions = permissions,
+				Groups = groups,
+				AuthLevel = authLevel,
+				Cooldown = cooldown
+			});
+		}
+		else Logger.Warn($"Chat command '{name}' already exists.");
+	}
+	public void AddChatCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		AddChatCommand(name, plugin, (player, cmd, args) =>
+		{
+			var argData = Pool.GetList<object>();
+			var result = (object[])null;
+			try
+			{
+				var m = plugin.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+				var ps = m.GetParameters();
+				switch (ps.Length)
+				{
+					case 1:
+						{
+							if (ps.ElementAt(0).ParameterType.Name == "IPlayer") argData.Add(player.AsIPlayer()); else argData.Add(player);
+							result = argData.ToArray();
+							break;
+						}
+
+					case 2:
+						{
+							if (ps.ElementAt(0).ParameterType.Name == "IPlayer") argData.Add(player.AsIPlayer()); else argData.Add(player);
+							argData.Add(cmd);
+							result = argData.ToArray();
+							break;
+						}
+
+					case 3:
+						{
+							if (ps.ElementAt(0).ParameterType.Name == "IPlayer") argData.Add(player.AsIPlayer()); else argData.Add(player);
+							argData.Add(cmd);
+							argData.Add(args);
+							result = argData.ToArray();
+							break;
+						}
+				}
+
+				m?.Invoke(plugin, result);
+			}
+			catch (Exception ex) { if (plugin is CarbonPlugin rustPlugin) rustPlugin.LogError("Error", ex.InnerException ?? ex); }
+
+			if (argData != null) Pool.FreeList(ref argData);
+			if (result != null) Pool.Free(ref result);
+		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+	}
+	public void AddConsoleCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		if (Community.Runtime.AllConsoleCommands.Count(x => x.Name == name) == 0)
+		{
+			Community.Runtime.AllConsoleCommands.Add(new Command
+			{
+				Name = name,
+				Plugin = plugin,
+				SkipOriginal = skipOriginal,
+				Callback = callback,
+				Help = help,
+				Reference = reference,
+				Permissions = permissions,
+				Groups = groups,
+				AuthLevel = authLevel,
+				Cooldown = cooldown
+			});
+		}
+		else Logger.Warn($"Console command '{name}' already exists.");
+	}
+	public void AddConsoleCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		AddConsoleCommand(name, plugin, (player, cmd, args) =>
+		{
+			var arguments = Pool.GetList<object>();
+			var result = (object[])null;
+
+			try
+			{
+				var fullString = args == null || args.Length == 0 ? string.Empty : string.Join(" ", args);
+				var client = player == null ? Option.Unrestricted : Option.Client;
+				var arg = FormatterServices.GetUninitializedObject(typeof(Arg)) as Arg;
+				if (player != null) client = client.FromConnection(player.net.connection);
+				client.FromRcon = FromRcon;
+				arg.Option = client;
+				arg.FullString = fullString;
+				arg.Args = args;
+
+				arguments.Add(arg);
+
+				try
+				{
+					var methodInfo = plugin.GetType().GetMethod(method, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+					var parameters = methodInfo.GetParameters();
+
+					if (parameters.Length > 0)
+					{
+						for (int i = 1; i < parameters.Length; i++)
+						{
+							arguments.Add(null);
+						}
+					}
+
+					result = arguments.ToArray();
+
+					if (HookCaller.CallStaticHook("OnCarbonCommand", arg) == null)
+					{
+						methodInfo?.Invoke(plugin, result);
+					}
+				}
+				catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin) carbonPlugin.LogError("Error", ex.InnerException ?? ex); }
+			}
+			catch (TargetParameterCountException) { }
+			catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin) carbonPlugin.LogError("Error", ex.InnerException ?? ex); }
+
+			Pool.FreeList(ref arguments);
+			if (result != null) Pool.Free(ref result);
+		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+	}
+	public void AddConsoleCommand(string name, BaseHookable plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		AddConsoleCommand(name, plugin, (player, cmd, args) =>
+		{
+			var arguments = Pool.GetList<object>();
+			var result = (object[])null;
+
+			try
+			{
+				var fullString = args == null || args.Length == 0 ? string.Empty : string.Join(" ", args);
+				var client = player == null ? Option.Unrestricted : Option.Client;
+				var arg = FormatterServices.GetUninitializedObject(typeof(Arg)) as Arg;
+				if (player != null) client = client.FromConnection(player.net.connection);
+				client.FromRcon = FromRcon;
+				arg.Option = client;
+				arg.FullString = fullString;
+				arg.Args = args;
+
+				arguments.Add(arg);
+				result = arguments.ToArray();
+
+				if (HookCaller.CallStaticHook ("OnCarbonCommand", arg) == null)
+				{
+					callback.Invoke(arg);
+				}
+			}
+			catch (TargetParameterCountException) { }
+			catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin ) carbonPlugin.LogError ( "Error", ex.InnerException ?? ex ); }
+
+			Pool.FreeList(ref arguments);
+			if (result != null) Pool.Free(ref result);
+		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+	}
+	public void AddCovalenceCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		AddChatCommand(name, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+		AddConsoleCommand(name, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+	}
+	public void AddCovalenceCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	{
+		AddChatCommand(name, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+		AddConsoleCommand(name, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
+	}
+
+	public void RemoveChatCommand(string name, BaseHookable plugin = null)
+	{
+		Community.Runtime.AllChatCommands.RemoveAll(x => x.Name == name && (plugin == null || x.Plugin == plugin));
+	}
+	public void RemoveConsoleCommand(string name, BaseHookable plugin = null)
+	{
+		Community.Runtime.AllConsoleCommands.RemoveAll(x => x.Name == name && (plugin == null || x.Plugin == plugin));
+	}
+
+	#endregion
 
 	#region Internals
 

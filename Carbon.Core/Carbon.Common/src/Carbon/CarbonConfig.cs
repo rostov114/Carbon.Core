@@ -12,7 +12,7 @@ using Oxide.Core.Libraries;
 namespace Carbon.Core;
 
 [Serializable]
-public class Config
+public class CarbonConfig
 {
 	public bool AutoUpdate { get; set; } = true;
 	public bool CarbonTag { get; set; } = true;

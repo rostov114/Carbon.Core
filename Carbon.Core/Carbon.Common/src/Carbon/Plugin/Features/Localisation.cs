@@ -38,11 +38,11 @@ namespace Carbon.Plugins.Features
 		{
 			var list = Facepunch.Pool.GetList<string>();
 
-			foreach (string text in Directory.GetDirectories(Interface.Oxide.LangDirectory))
+			foreach (string text in Directory.GetDirectories(Defines.GetLangFolder () ))
 			{
 				if (Directory.GetFiles(text).Length != 0 && (plugin == null || (plugin != null && OsEx.File.Exists(Path.Combine(text, plugin.Name + ".json")))))
 				{
-					list.Add(text.Substring(Interface.Oxide.LangDirectory.Length + 1));
+					list.Add(text.Substring(Defines.GetLangFolder ().Length + 1));
 				}
 			}
 
@@ -82,7 +82,7 @@ namespace Carbon.Plugins.Features
 				lang = lang.Replace(oldChar, '_');
 			}
 
-			var path = Path.Combine(Interface.Oxide.LangDirectory, lang, $"{plugin}.json");
+			var path = Path.Combine(Defines.GetLangFolder(), lang, $"{plugin}.json");
 
 			if (!OsEx.File.Exists(path))
 			{
@@ -128,7 +128,7 @@ namespace Carbon.Plugins.Features
 			if (newPhrases == phrases || save) SaveMessageFile(plugin.Name, lang);
 		}
 
-		public string GetMessage(string key, RustPlugin plugin, string player = null)
+		public string GetMessage(string key, Plugin plugin, string player = null)
 		{
 			var lang = GetLanguage(player);
 
@@ -149,7 +149,7 @@ namespace Carbon.Plugins.Features
 
 			return key;
 		}
-		public Dictionary<string, string> GetMessages(string lang, RustPlugin plugin)
+		public Dictionary<string, string> GetMessages(string lang, Plugin plugin)
 		{
 			return GetMessageFile(plugin.Name, lang);
 		}

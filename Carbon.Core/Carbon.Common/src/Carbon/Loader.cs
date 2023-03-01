@@ -10,7 +10,6 @@ using Carbon.Components;
 using Carbon.Extensions;
 using Carbon.Plugins;
 using Newtonsoft.Json;
-using Oxide.Plugins;
 
 /*
  *
@@ -76,7 +75,7 @@ public static class Loader
 		PendingRequirees.Clear();
 		requirees.Clear();
 		requirees = null;
-	}
+	}	  
 	public static void ClearAllErrored()
 	{
 		foreach (var mod in FailedMods)
@@ -189,10 +188,10 @@ public static class Loader
 		}
 	}
 
-	public static bool InitializePlugin(Type type, out RustPlugin plugin, CarbonMod mod = null, Action<RustPlugin> preInit = null)
+	public static bool InitializePlugin(Type type, out CarbonPlugin plugin, CarbonMod mod = null, Action<CarbonPlugin> preInit = null)
 	{
 		var instance = Activator.CreateInstance(type, false);
-		plugin = instance as RustPlugin;
+		plugin = instance as CarbonPlugin;
 		var info = type.GetCustomAttribute<InfoAttribute>();
 		var desc = type.GetCustomAttribute<DescriptionAttribute>();
 
@@ -225,7 +224,7 @@ public static class Loader
 
 		return true;
 	}
-	public static bool UninitializePlugin(RustPlugin plugin)
+	public static bool UninitializePlugin(CarbonPlugin plugin)
 	{
 		plugin.CallHook("Unload");
 		plugin.IUnload();
@@ -270,24 +269,24 @@ public static class Loader
 			{
 				foreach (var commandName in command.Names)
 				{
-					Community.Runtime.CorePlugin.cmd.AddChatCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", hookable, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
-					Community.Runtime.CorePlugin.cmd.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", hookable, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+					Community.Runtime.CorePlugin.AddChatCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", hookable, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+					Community.Runtime.CorePlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", hookable, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 				}
 			}
 
 			if (chatCommand != null)
 			{
-				Community.Runtime.CorePlugin.cmd.AddChatCommand(string.IsNullOrEmpty(prefix) ? chatCommand.Name : $"{prefix}.{chatCommand.Name}", hookable, method.Name, help: chatCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+				Community.Runtime.CorePlugin.AddChatCommand(string.IsNullOrEmpty(prefix) ? chatCommand.Name : $"{prefix}.{chatCommand.Name}", hookable, method.Name, help: chatCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 			}
 
 			if (consoleCommand != null)
 			{
-				Community.Runtime.CorePlugin.cmd.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? consoleCommand.Name : $"{prefix}.{consoleCommand.Name}", hookable, method.Name, help: consoleCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+				Community.Runtime.CorePlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? consoleCommand.Name : $"{prefix}.{consoleCommand.Name}", hookable, method.Name, help: consoleCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 			}
 
 			if (uiCommand != null)
 			{
-				Community.Runtime.CorePlugin.cmd.AddConsoleCommand(UiCommandAttribute.Uniquify(string.IsNullOrEmpty(prefix) ? uiCommand.Name : $"{prefix}.{uiCommand.Name}"), hookable, method.Name, help: uiCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+				Community.Runtime.CorePlugin.AddConsoleCommand(UiCommandAttribute.Uniquify(string.IsNullOrEmpty(prefix) ? uiCommand.Name : $"{prefix}.{uiCommand.Name}"), hookable, method.Name, help: uiCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 			}
 		}
 
@@ -305,7 +304,7 @@ public static class Loader
 
 			if (var != null)
 			{
-				Community.Runtime.CorePlugin.cmd.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", hookable, (player, command, args) =>
+				Community.Runtime.CorePlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", hookable, (player, command, args) =>
 				{
 					if (player != null && var.AdminOnly && !player.IsAdmin)
 					{
@@ -366,7 +365,7 @@ public static class Loader
 
 			if (var != null)
 			{
-				Community.Runtime.CorePlugin.cmd.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", hookable, (player, command, args) =>
+				Community.Runtime.CorePlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", hookable, (player, command, args) =>
 				{
 					if (player != null && var.AdminOnly && !player.IsAdmin)
 					{
@@ -417,7 +416,7 @@ public static class Loader
 		Facepunch.Pool.Free(ref fields);
 		Facepunch.Pool.Free(ref properties);
 	}
-	public static void RemoveCommands(RustPlugin plugin)
+	public static void RemoveCommands(CarbonPlugin plugin)
 	{
 		Community.Runtime.AllChatCommands.RemoveAll(x => x.Plugin == plugin);
 		Community.Runtime.AllConsoleCommands.RemoveAll(x => x.Plugin == plugin);

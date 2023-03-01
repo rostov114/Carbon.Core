@@ -5,11 +5,12 @@ using System.Runtime.InteropServices;
 using API.Contracts;
 using API.Events;
 using Carbon.Base.Interfaces;
+using Carbon.Components;
 using Carbon.Contracts;
 using Carbon.Core;
 using Carbon.Extensions;
+using Carbon.Plugins;
 using Newtonsoft.Json;
-using Oxide.Plugins;
 using UnityEngine;
 
 /*
@@ -43,8 +44,8 @@ public class Community
 
 	public static bool IsConfigReady => Runtime != null && Runtime.Config != null;
 
-	public Config Config { get; set; }
-	public RustPlugin CorePlugin { get; set; }
+	public CarbonConfig Config { get; set; }
+	public CarbonPlugin CorePlugin { get; set; }
 	public Loader.CarbonMod Plugins { get; set; }
 	public Entities Entities { get; set; }
 
@@ -115,8 +116,8 @@ public class Community
 		}
 		else
 		{
-			AllChatCommands.RemoveAll(x => !(x.Plugin is IModule) && (x.Plugin is RustPlugin && !(x.Plugin as RustPlugin).IsCorePlugin));
-			AllConsoleCommands.RemoveAll(x => !(x.Plugin is IModule) && (x.Plugin is RustPlugin && !(x.Plugin as RustPlugin).IsCorePlugin));
+			AllChatCommands.RemoveAll(x => x.Plugin is not IModule && (x.Plugin is CarbonPlugin && !(x.Plugin as CarbonPlugin).IsCorePlugin));
+			AllConsoleCommands.RemoveAll(x => x.Plugin is not IModule && (x.Plugin is CarbonPlugin && !(x.Plugin as CarbonPlugin).IsCorePlugin));
 		}
 	}
 
@@ -130,7 +131,7 @@ public class Community
 			return;
 		}
 
-		Config = JsonConvert.DeserializeObject<Config>(OsEx.File.ReadText(Defines.GetConfigFile()));
+		Config = JsonConvert.DeserializeObject<CarbonConfig>(OsEx.File.ReadText(Defines.GetConfigFile()));
 
 		var needsSave = false;
 		if (Config.ConditionalCompilationSymbols == null)
@@ -149,7 +150,7 @@ public class Community
 
 	public void SaveConfig()
 	{
-		if (Config == null) Config = new Config();
+		if (Config == null) Config = new CarbonConfig();
 
 		OsEx.File.Create(Defines.GetConfigFile(), JsonConvert.SerializeObject(Config, Formatting.Indented));
 	}
@@ -192,8 +193,8 @@ public class Community
 
 	#region Commands
 
-	public List<OxideCommand> AllChatCommands { get; } = new List<OxideCommand>();
-	public List<OxideCommand> AllConsoleCommands { get; } = new List<OxideCommand>();
+	public List<Command> AllChatCommands { get; } = new List<Command>();
+	public List<Command> AllConsoleCommands { get; } = new List<Command>();
 
 	#endregion
 

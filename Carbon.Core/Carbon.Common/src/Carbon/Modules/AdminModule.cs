@@ -1660,7 +1660,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 	}
 	public class CarbonTab
 	{
-		public static Core.Config Config => Community.Runtime.Config;
+		public static Core.CarbonConfig Config => Community.Runtime.Config;
 
 		public static Tab Get()
 		{
