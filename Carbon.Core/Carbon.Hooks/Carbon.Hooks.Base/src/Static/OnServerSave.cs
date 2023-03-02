@@ -32,7 +32,6 @@ public partial class Category_Static
 				HookCaller.CallStaticHook("OnServerSave");
 
 				Logger.Log($"Saving Carbon state..");
-				Interface.Oxide.Permission.SaveData();
 			}
 		}
 	}

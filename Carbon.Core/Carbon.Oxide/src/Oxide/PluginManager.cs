@@ -2,6 +2,7 @@
 using System.Linq;
 using Carbon;
 using Carbon.Core;
+using Carbon.Plugins;
 using Oxide.Plugins;
 
 /*
@@ -36,13 +37,13 @@ public class PluginManager
 		return false;
 	}
 
-	public Plugin GetPlugin(string name)
+	public CarbonPlugin GetPlugin(string name)
 	{
 		if (name == "RustCore") return Community.Runtime.CorePlugin;
 
 		return Community.Runtime.Plugins.Plugins.FirstOrDefault(x => x.Name == name);
 	}
-	public IEnumerable<Plugin> GetPlugins()
+	public IEnumerable<CarbonPlugin> GetPlugins()
 	{
 		return Community.Runtime.Plugins.Plugins.AsEnumerable();
 	}

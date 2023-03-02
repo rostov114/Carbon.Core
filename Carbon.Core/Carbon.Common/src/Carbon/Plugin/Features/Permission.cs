@@ -367,7 +367,7 @@ namespace Carbon.Features
 		{
 			return GroupExists(name) && !string.IsNullOrEmpty(perm) && _groups.TryGetValue(name.ToLower(), out var groupData) && (groupData.Perms.Contains(perm.ToLower()) || GroupHasPermission(groupData.ParentGroup, perm));
 		}
-		public virtual bool UserHasPermission(string id, string perm)
+		public virtual bool PlayerHasPermission(string id, string perm)
 		{
 			if (string.IsNullOrEmpty(perm)) return false;
 			if (id.Equals("server_console")) return true;

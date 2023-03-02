@@ -109,7 +109,7 @@ public class OxideMod
 		return HookCaller.CallStaticDeprecatedHook(oldHook, newHook, expireDate, args);
 	}
 
-	public T GetLibrary<T>(string name = null) where T : IDisposable
+	public T GetLibrary<T>(string name = null) where T : class
 	{
 		var type = typeof(T);
 

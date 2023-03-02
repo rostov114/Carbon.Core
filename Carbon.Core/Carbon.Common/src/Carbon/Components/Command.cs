@@ -9,6 +9,8 @@ namespace Carbon.Components
 {
 	public class Command
 	{
+		public static bool FromRcon { get; set; }
+
 		public string Name { get; set; }
 		public BaseHookable Plugin { get; set; }
 		public Action<BasePlayer, string, string[]> Callback { get; set; }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
 using API.Hooks;
+using Carbon.Components;
 using Carbon.Extensions;
 using Facepunch;
-using Oxide.Game.Rust.Libraries;
 
 /*
  *
@@ -47,7 +47,7 @@ public partial class Category_Static
 
 					foreach (var carbonCommand in Community.Runtime.AllConsoleCommands)
 					{
-						if (carbonCommand.Command == command)
+						if (carbonCommand.Name == command)
 						{
 							try
 							{

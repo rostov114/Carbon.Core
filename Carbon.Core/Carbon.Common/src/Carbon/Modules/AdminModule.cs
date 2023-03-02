@@ -1552,10 +1552,10 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 
 				perms.AddRow(3, new Tab.OptionButton($"{perm}", instance5 =>
 				{
-					if (permission.UserHasPermission(player.UserIDString, perm))
+					if (permission.PlayerHasPermission(player.UserIDString, perm))
 						Community.Runtime.Permission.RevokePlayerPermission(player.UserIDString, perm);
 					else Community.Runtime.Permission.GrantPlayerPermission(player.UserIDString, perm, plugin);
-				}, type: (_instance) => isInherited ? Tab.OptionButton.Types.Important : permission.UserHasPermission(player.UserIDString, perm) ? Tab.OptionButton.Types.Selected : Tab.OptionButton.Types.None));
+				}, type: (_instance) => isInherited ? Tab.OptionButton.Types.Important : permission.PlayerHasPermission(player.UserIDString, perm) ? Tab.OptionButton.Types.Selected : Tab.OptionButton.Types.None));
 
 				if (isInherited)
 				{

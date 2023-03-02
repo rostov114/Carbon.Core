@@ -1,9 +1,9 @@
 ﻿using System;
 using API.Hooks;
 using Carbon.Extensions;
+using Carbon.Plugins;
 using ConVar;
 using Facepunch.Extend;
-using Oxide.Plugins;
 
 /*
  *
@@ -47,7 +47,7 @@ public partial class Category_Static
 
 					foreach (var cmd in Community.Runtime?.AllChatCommands)
 					{
-						if (cmd.Command == command)
+						if (cmd.Name == command)
 						{
 							if (player != null)
 							{
@@ -56,7 +56,7 @@ public partial class Category_Static
 									var hasPerm = cmd.Permissions.Length == 0;
 									foreach (var permission in cmd.Permissions)
 									{
-										if (cmd.Plugin is RustPlugin rust && rust.permission.UserHasPermission(player.UserIDString, permission))
+										if (cmd.Plugin is CarbonPlugin rust && Community.Runtime.Permission.PlayerHasPermission(player.UserIDString, permission))
 										{
 											hasPerm = true;
 											break;
@@ -75,7 +75,7 @@ public partial class Category_Static
 									var hasGroup = cmd.Groups.Length == 0;
 									foreach (var group in cmd.Groups)
 									{
-										if (cmd.Plugin is RustPlugin rust && rust.permission.UserHasGroup(player.UserIDString, group))
+										if (cmd.Plugin is CarbonPlugin rust && Community.Runtime.Permission.PlayerHasGroup(player.UserIDString, group))
 										{
 											hasGroup = true;
 											break;
@@ -100,7 +100,7 @@ public partial class Category_Static
 									}
 								}
 
-								if (CooldownAttribute.IsCooledDown(player, cmd.Command, cmd.Cooldown, true))
+								if (CooldownAttribute.IsCooledDown(player, cmd.Name, cmd.Cooldown, true))
 								{
 									continue;
 								}

@@ -1,4 +1,6 @@
-﻿using API.Hooks;
+﻿using API.Events;
+using System;
+using API.Hooks;
 using Oxide.Core;
 
 /*
@@ -29,10 +31,9 @@ public partial class Category_Static
 				HookCaller.CallStaticHook("OnServerShutdown");
 
 				Logger.Log($"Saving Carbon state..");
-				Interface.Oxide.Permission.SaveData();
+				Events.Trigger(CarbonEvent.OnServerSave, EventArgs.Empty);
 
 				Logger.Log($"Shutting down Carbon..");
-				Interface.Oxide.OnShutdown();
 				Community.Runtime.ScriptProcessor.Clear();
 			}
 		}

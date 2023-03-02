@@ -17,6 +17,10 @@ namespace Oxide.Core
 
 		public Interface()
 		{
+			Community.Runtime.Events.Subscribe(API.Events.CarbonEvent.OnServerSave, args =>
+			{
+				Interface.Oxide.Permission.SaveData();
+			});
 			Initialize();
 		}
 
