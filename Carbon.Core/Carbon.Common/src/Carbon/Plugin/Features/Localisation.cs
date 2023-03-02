@@ -28,7 +28,7 @@ namespace Carbon.Features
 
 		public string GetLanguage(string userId)
 		{
-			if (!string.IsNullOrEmpty(userId) && Community.Permission.PlayerExists(userId, out var data))
+			if (!string.IsNullOrEmpty(userId) && Community.Runtime.Permission.PlayerExists(userId, out var data))
 			{
 				return data.Language;
 			}
@@ -55,10 +55,10 @@ namespace Carbon.Features
 		{
 			if (string.IsNullOrEmpty(lang) || string.IsNullOrEmpty(userId)) return;
 
-			if (Community.Permission.PlayerExists(userId, out var data))
+			if (Community.Runtime.Permission.PlayerExists(userId, out var data))
 			{
 				data.Language = lang;
-				Community.Permission.SaveData();
+				Community.Runtime.Permission.SaveData();
 			}
 		}
 		public void SetServerLanguage(string lang)

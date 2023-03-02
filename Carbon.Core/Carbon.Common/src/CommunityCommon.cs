@@ -53,9 +53,10 @@ public class Community
 
 	#region Modding
 
-	public static Permission Permission = new();
-	public static WebRequests WebRequests = new();
-	public static Timers Timers = new();
+	public Permission Permission = new();
+	public WebRequests WebRequests = new();
+	public Timers Timers = new();
+	public Localisation Localisation = new(null);
 
 	#endregion
 

@@ -2,8 +2,8 @@
 using System.Reflection;
 using Carbon;
 using Carbon.Core;
-using Carbon.Oxide;
 using Oxide.Core.Libraries;
+using Oxide.Game.Rust.Libraries;
 
 /*
  *
@@ -20,6 +20,8 @@ public class OxideMod
 	public PluginManager RootPluginManager { get; private set; }
 
 	public Permission Permission { get; private set; }
+	public Command Command { get; private set; }
+	public Oxide.Game.Rust.Libraries.Rust Rust { get; private set; }
 
 	public string RootDirectory { get; private set; }
 	public string InstanceDirectory { get; private set; }
@@ -57,6 +59,9 @@ public class OxideMod
 				Permission = new Permission();
 				break;
 		}
+
+		Command = new();
+		Rust = new();
 	}
 
 	public void NextTick(Action callback)
@@ -104,14 +109,14 @@ public class OxideMod
 		return HookCaller.CallStaticDeprecatedHook(oldHook, newHook, expireDate, args);
 	}
 
-	public T GetLibrary<T>(string name = null) where T : Library
+	public T GetLibrary<T>(string name = null) where T : IDisposable
 	{
 		var type = typeof(T);
 
-		if (type == typeof(Permission)) return Community.Runtime.CorePlugin.permission as T;
-		else if (type == typeof(Lang)) return Community.Runtime.CorePlugin.lang as T;
-		else if (type == typeof(Game.Rust.Libraries.Command)) return Community.Runtime.CorePlugin.cmd as T;
-		else if (type == typeof(Game.Rust.Libraries.Rust)) return Community.Runtime.CorePlugin.rust as T;
+		if (type == typeof(Permission)) return Community.Runtime.Permission as T;
+		else if (type == typeof(Lang)) return Community.Runtime.Localisation as T;
+		else if (type == typeof(Game.Rust.Libraries.Command)) return Interface.Oxide.Command as T;
+		else if (type == typeof(Game.Rust.Libraries.Rust)) return Interface.Oxide.Rust as T;
 
 		return Activator.CreateInstance<T>();
 	}

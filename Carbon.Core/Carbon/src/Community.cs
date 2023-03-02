@@ -4,9 +4,8 @@ using System.Reflection;
 using API.Events;
 using Carbon.Core;
 using Carbon.Hooks;
+using Carbon.Plugins;
 using Carbon.Processors;
-using Oxide.Core;
-using Oxide.Plugins;
 using UnityEngine;
 
 /*
@@ -41,7 +40,7 @@ public class CommunityInternal : Community
 		Plugins = new Loader.CarbonMod { Name = "Scripts", IsCoreMod = true };
 		CorePlugin.IInit();
 
-		Loader.LoadedMods.Add(new Loader.CarbonMod { Name = "Carbon Community", IsCoreMod = true, Plugins = new List<RustPlugin> { CorePlugin } });
+		Loader.LoadedMods.Add(new Loader.CarbonMod { Name = "Carbon Community", IsCoreMod = true, Plugins = new List<CarbonPlugin> { CorePlugin } });
 		Loader.LoadedMods.Add(Plugins);
 
 		Loader.ProcessCommands(typeof(CorePlugin), CorePlugin, prefix: "c");
@@ -130,8 +129,6 @@ public class CommunityInternal : Community
 			HookValidator.Initialize();
 
 			_installProcessors();
-
-			Interface.Initialize();
 
 			RefreshConsoleInfo();
 
