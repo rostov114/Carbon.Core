@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Carbon.Contracts;
 using Carbon.Core;
 using Carbon.Extensions;
 using Carbon.Plugins;
+using Carbon.Plugins.Features;
 using Facepunch;
 
 /*
@@ -19,7 +21,7 @@ namespace Carbon.Components;
 public class Report : IDisposable
 {
 	public static Action<string> OnPluginAdded;
-	public static Action<Plugin, List<string>> OnPluginCompiled;
+	public static Action<IPlugin, List<string>> OnPluginCompiled;
 	public static Action OnProcessEnded;
 
 	public Dictionary<string, Result> Results;
@@ -126,7 +128,7 @@ public class Report : IDisposable
 	{
 		public string FilePath;
 		public string FileName;
-		public Plugin Plugin;
+		public IPlugin Plugin;
 		public string[] IncompatibleHooks;
 	}
 }

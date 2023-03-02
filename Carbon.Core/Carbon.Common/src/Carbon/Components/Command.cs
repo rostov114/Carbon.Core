@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Carbon.Base;
+using Carbon.Contracts;
 
 namespace Carbon.Components
 {
@@ -12,7 +13,7 @@ namespace Carbon.Components
 		public static bool FromRcon { get; set; }
 
 		public string Name { get; set; }
-		public BaseHookable Plugin { get; set; }
+		public IPluginMetadata Plugin { get; set; }
 		public Action<BasePlayer, string, string[]> Callback { get; set; }
 		public string[] Permissions { get; set; }
 		public string[] Groups { get; set; }

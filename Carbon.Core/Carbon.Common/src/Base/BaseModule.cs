@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reflection;
 using Carbon.Base.Interfaces;
+using Carbon.Contracts;
 using Carbon.Core;
 using Carbon.Features;
 
@@ -14,7 +15,7 @@ using Carbon.Features;
 
 namespace Carbon.Base;
 
-public class BaseModule : BaseHookable
+public class BaseModule : BaseHookable, IPluginMetadata
 {
 	public virtual bool EnabledByDefault => false;
 
@@ -28,7 +29,7 @@ public class BaseModule : BaseHookable
 		return default;
 	}
 }
-public class CarbonModule<C, D> : BaseModule, IModule
+public class CarbonModule<C, D> : BaseModule, IHookableModule
 {
 	public JsonConfig File { get; private set; }
 	public JsonConfig Data { get; private set; }

@@ -328,8 +328,8 @@ public class CorePlugin : CarbonPlugin
 			{
 				if (plugin.HasConditionals)
 				{
-					plugin._processor_instance.Dispose();
-					plugin._processor_instance.Execute();
+					plugin.ProcessorInstance.Dispose();
+					plugin.ProcessorInstance.Execute();
 					mod.Plugins.Remove(plugin);
 				}
 			}
@@ -365,8 +365,8 @@ public class CorePlugin : CarbonPlugin
 			{
 				if (plugin.HasConditionals)
 				{
-					plugin._processor_instance.Dispose();
-					plugin._processor_instance.Execute();
+					plugin.ProcessorInstance.Dispose();
+					plugin.ProcessorInstance.Execute();
 					mod.Plugins.Remove(plugin);
 				}
 			}
@@ -781,8 +781,8 @@ public class CorePlugin : CarbonPlugin
 					{
 						if (plugin.Name == name)
 						{
-							plugin._processor_instance.Dispose();
-							plugin._processor_instance.Execute();
+							plugin.ProcessorInstance.Dispose();
+							plugin.ProcessorInstance.Execute();
 							mod.Plugins.Remove(plugin);
 						}
 					}
@@ -903,7 +903,7 @@ public class CorePlugin : CarbonPlugin
 					{
 						if (plugin.Name == name)
 						{
-							plugin._processor_instance.Dispose();
+							plugin.ProcessorInstance.Dispose();
 							mod.Plugins.Remove(plugin);
 						}
 					}

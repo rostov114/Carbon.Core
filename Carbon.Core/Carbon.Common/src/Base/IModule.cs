@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Reflection;
+using Carbon.Contracts;
 
 /*
  *
@@ -9,14 +11,11 @@
 
 namespace Carbon.Base.Interfaces;
 
-public interface IModule : IHookableModule, IDisposable
+public interface IModule : IInitializable, IPluginMetadata
 {
-	string Name { get; }
-
 	void Init();
 	void InitEnd();
 	void Save();
-	void Load();
 
 	void SetEnabled(bool enabled);
 	bool GetEnabled();

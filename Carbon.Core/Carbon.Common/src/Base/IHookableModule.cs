@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using Carbon.Contracts;
+using Carbon.Plugins.Features;
 
 /*
  *
@@ -10,7 +13,7 @@ using System.Reflection;
 
 namespace Carbon.Base.Interfaces;
 
-public interface IHookableModule
+public interface IHookableModule : IModule, IDisposable
 {
 	Dictionary<string, List<MethodInfo>> HookCache { get; }
 }

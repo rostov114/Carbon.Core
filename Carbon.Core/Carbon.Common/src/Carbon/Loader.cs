@@ -7,8 +7,10 @@ using API.Contracts;
 using API.Events;
 using Carbon.Base;
 using Carbon.Components;
+using Carbon.Contracts;
 using Carbon.Extensions;
 using Carbon.Plugins;
+using Carbon.Plugins.Features;
 using Newtonsoft.Json;
 
 /*
@@ -34,7 +36,7 @@ public static class Loader
 		);
 	}
 
-	public static List<string> GetRequirees(Plugin initial)
+	public static List<string> GetRequirees(IPlugin initial)
 	{
 		if (PendingRequirees.TryGetValue(initial.FilePath, out var requirees))
 		{
@@ -43,7 +45,7 @@ public static class Loader
 
 		return null;
 	}
-	public static void AddPendingRequiree(Plugin initial, Plugin requiree)
+	public static void AddPendingRequiree(IPlugin initial, IPlugin requiree)
 	{
 		if (!PendingRequirees.TryGetValue(initial.FilePath, out var requirees))
 		{
@@ -52,7 +54,7 @@ public static class Loader
 
 		requirees.Add(requiree.FilePath);
 	}
-	public static void ClearPendingRequirees(Plugin initial)
+	public static void ClearPendingRequirees(IPlugin initial)
 	{
 		if (PendingRequirees.TryGetValue(initial.FilePath, out var requirees))
 		{
@@ -188,7 +190,7 @@ public static class Loader
 		}
 	}
 
-	public static bool InitializePlugin(Type type, out CarbonPlugin plugin, CarbonMod mod = null, Action<CarbonPlugin> preInit = null)
+	public static bool InitializePlugin(Type type, out IPlugin plugin, CarbonMod mod = null, Action<IPlugin> preInit = null)
 	{
 		var instance = Activator.CreateInstance(type, false);
 		plugin = instance as CarbonPlugin;
@@ -224,9 +226,9 @@ public static class Loader
 
 		return true;
 	}
-	public static bool UninitializePlugin(CarbonPlugin plugin)
+	public static bool UninitializePlugin(IPlugin plugin)
 	{
-		plugin.CallHook("Unload");
+		plugin.Unload();
 		plugin.IUnload();
 
 		RemoveCommands(plugin);
@@ -244,7 +246,7 @@ public static class Loader
 		return IsValidPlugin(type.BaseType);
 	}
 
-	public static void ProcessCommands(Type type, BaseHookable hookable = null, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance, string prefix = null)
+	public static void ProcessCommands(Type type, IPluginMetadata plugin = null, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance, string prefix = null)
 	{
 		var methods = type.GetMethods(flags);
 		var fields = type.GetFields(flags | BindingFlags.Public);
@@ -269,24 +271,24 @@ public static class Loader
 			{
 				foreach (var commandName in command.Names)
 				{
-					CarbonPlugin.AddChatCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", hookable, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
-					CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", hookable, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+					CarbonPlugin.AddChatCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", plugin, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+					CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? commandName : $"{prefix}.{commandName}", plugin, method.Name, help: command.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 				}
 			}
 
 			if (chatCommand != null)
 			{
-				CarbonPlugin.AddChatCommand(string.IsNullOrEmpty(prefix) ? chatCommand.Name : $"{prefix}.{chatCommand.Name}", hookable, method.Name, help: chatCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+				CarbonPlugin.AddChatCommand(string.IsNullOrEmpty(prefix) ? chatCommand.Name : $"{prefix}.{chatCommand.Name}", plugin, method.Name, help: chatCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 			}
 
 			if (consoleCommand != null)
 			{
-				CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? consoleCommand.Name : $"{prefix}.{consoleCommand.Name}", hookable, method.Name, help: consoleCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+				CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? consoleCommand.Name : $"{prefix}.{consoleCommand.Name}", plugin, method.Name, help: consoleCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 			}
 
 			if (uiCommand != null)
 			{
-				CarbonPlugin.AddConsoleCommand(UiCommandAttribute.Uniquify(string.IsNullOrEmpty(prefix) ? uiCommand.Name : $"{prefix}.{uiCommand.Name}"), hookable, method.Name, help: uiCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
+				CarbonPlugin.AddConsoleCommand(UiCommandAttribute.Uniquify(string.IsNullOrEmpty(prefix) ? uiCommand.Name : $"{prefix}.{uiCommand.Name}"), plugin, method.Name, help: uiCommand.Help, reference: method, permissions: ps, groups: gs, authLevel: authLevel, cooldown: cooldownTime);
 			}
 		}
 
@@ -304,7 +306,7 @@ public static class Loader
 
 			if (var != null)
 			{
-				CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", hookable, (player, command, args) =>
+				CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", plugin, (player, command, args) =>
 				{
 					if (player != null && var.AdminOnly && !player.IsAdmin)
 					{
@@ -312,7 +314,7 @@ public static class Loader
 						return;
 					}
 
-					var value = field.GetValue(hookable);
+					var value = field.GetValue(plugin);
 
 					if (args != null && args.Length > 0)
 					{
@@ -341,7 +343,7 @@ public static class Loader
 								value = rawString.ToBool();
 							}
 
-							field.SetValue(hookable, value);
+							field.SetValue(plugin, value);
 						}
 						catch { }
 					}
@@ -365,7 +367,7 @@ public static class Loader
 
 			if (var != null)
 			{
-				CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", hookable, (player, command, args) =>
+				CarbonPlugin.AddConsoleCommand(string.IsNullOrEmpty(prefix) ? var.Name : $"{prefix}.{var.Name}", plugin, (player, command, args) =>
 				{
 					if (player != null && var.AdminOnly && !player.IsAdmin)
 					{
@@ -373,7 +375,7 @@ public static class Loader
 						return;
 					}
 
-					var value = property.GetValue(hookable);
+					var value = property.GetValue(plugin);
 
 					if (args != null && args.Length > 0)
 					{
@@ -402,7 +404,7 @@ public static class Loader
 								value = rawString.ToBool();
 							}
 
-							property.SetValue(hookable, value);
+							property.SetValue(plugin, value);
 						}
 						catch { }
 					}
@@ -416,7 +418,7 @@ public static class Loader
 		Facepunch.Pool.Free(ref fields);
 		Facepunch.Pool.Free(ref properties);
 	}
-	public static void RemoveCommands(CarbonPlugin plugin)
+	public static void RemoveCommands(IPlugin plugin)
 	{
 		Community.Runtime.AllChatCommands.RemoveAll(x => x.Plugin == plugin);
 		Community.Runtime.AllConsoleCommands.RemoveAll(x => x.Plugin == plugin);
@@ -432,7 +434,7 @@ public static class Loader
 			{
 				foreach (var plugin in mod.Plugins)
 				{
-					try { plugin._applyPluginReferences(); } catch { }
+					try { plugin.ApplyPluginReferences(); } catch { }
 				}
 			}
 
@@ -456,20 +458,20 @@ public static class Loader
 				}
 			}
 
-			foreach (var plugin in Community.Runtime.ModuleProcessor.Modules)
+			foreach (var module in Community.Runtime.ModuleProcessor.Modules)
 			{
-				if (plugin.HasInitialized) continue;
+				if (module.HasInitialized) continue;
 
 				try
 				{
-					HookCaller.CallHook(plugin, "OnServerInitialized", Community.IsServerFullyInitialized);
+					HookCaller.CallHook(module, "OnServerInitialized", Community.IsServerFullyInitialized);
 				}
 				catch (Exception initException)
 				{
-					Logger.Error($"[{plugin.Name}] Failed OnServerInitialized.", initException);
+					Logger.Error($"[{module.Name}] Failed OnServerInitialized.", initException);
 				}
 
-				plugin.HasInitialized = true;
+				module.HasInitialized = true;
 			}
 
 			if (counter > 1)
@@ -561,7 +563,7 @@ public static class Loader
 		public List<IHarmonyMod> Hooks { get; } = new List<IHarmonyMod>();
 
 		[JsonProperty]
-		public List<CarbonPlugin> Plugins { get; set; } = new List<CarbonPlugin>();
+		public List<IPlugin> Plugins { get; set; } = new ();
 	}
 
 	[JsonObject(MemberSerialization.OptIn)]

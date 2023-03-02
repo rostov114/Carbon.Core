@@ -3,11 +3,12 @@ using System.IO;
 using Carbon.Extensions;
 using Carbon.Core;
 using Oxide.Core;
-using Oxide.Core.Configuration;
 using Oxide.Core.Libraries;
 using Oxide.Game.Rust.Libraries;
 using UnityEngine;
 using Carbon.Plugins;
+using WebRequests = Oxide.Core.Libraries.WebRequests;
+using Carbon.Contracts;
 
 /*
  *
@@ -18,7 +19,7 @@ using Carbon.Plugins;
 
 namespace Oxide.Plugins;
 
-public class RustPlugin : CarbonPlugin
+public class RustPlugin : Plugin, IPlugin
 {
 	public PluginManager Manager { get; set; }
 
@@ -30,9 +31,10 @@ public class RustPlugin : CarbonPlugin
 	public Timers timer { get; set; }
 	public OxideMod mod { get; set; }
 	public WebRequests webrequest { get; set; }
-	public Oxide.Game.Rust.Libraries.Rust rust { get; set; }
+	public Game.Rust.Libraries.Rust rust { get; set; }
 	public CovalencePlugin.Covalence covalence { get; set; }
 
+	public IBaseProcessor Processor { get; set; }
 
 	public Player Player { get { return rust.Player; } private set { } }
 	public Server Server { get { return rust.Server; } private set { } }
@@ -57,6 +59,9 @@ public class RustPlugin : CarbonPlugin
 		rust = new Game.Rust.Libraries.Rust();
 		webrequest = new WebRequests();
 		covalence = new CovalencePlugin.Covalence();
+
+		Persistence = new GameObject($"Script_{Name}").AddComponent<Persistence>();
+		UnityEngine.Object.DontDestroyOnLoad(Persistence.gameObject);
 
 		mod.Load();
 	}

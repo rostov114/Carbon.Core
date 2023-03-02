@@ -3,7 +3,7 @@ using System.Buffers;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using Carbon.Base;
+using Carbon.Contracts;
 using Carbon.Core;
 using Facepunch;
 
@@ -30,8 +30,8 @@ namespace Carbon
 		public virtual object[] RescaleBuffer(object[] oldBuffer, int newScale) => null;
 		public virtual void ClearBuffer(object[] buffer) { }
 
-		public virtual object CallHook<T>(T plugin, string hookName, BindingFlags flags, object[] args) where T : BaseHookable => null;
-		public virtual object CallDeprecatedHook<T>(T plugin, string oldHook, string newHook, DateTime expireDate, BindingFlags flags, object[] args) where T : BaseHookable => null;
+		public virtual object CallHook<T>(T plugin, string hookName, BindingFlags flags, object[] args) where T : IPluginMetadata => null;
+		public virtual object CallDeprecatedHook<T>(T plugin, string oldHook, string newHook, DateTime expireDate, BindingFlags flags, object[] args) where T : IPluginMetadata => null;
 	}
 
 	public static class HookCaller
@@ -60,7 +60,7 @@ namespace Carbon
 		private static object CallStaticHook(string hookName, BindingFlags flag = BindingFlags.NonPublic | BindingFlags.Static, object[] args = null)
 		{
 			var objectOverride = (object)null;
-			var hookableOverride = (BaseHookable)null;
+			var hookableOverride = (IPlugin)null;
 
 			Caller.ClearHookTime(hookName);
 
@@ -76,7 +76,7 @@ namespace Carbon
 				if (result != null)
 				{
 					objectOverride = result;
-					hookableOverride = module;
+					hookableOverride = module as IPlugin;
 				}
 			}
 
@@ -128,19 +128,19 @@ namespace Carbon
 			return CallStaticHook(oldHook, flag, args);
 		}
 
-		public static object CallHook(BaseHookable plugin, string hookName)
+		public static object CallHook(IPlugin plugin, string hookName)
 		{
 			return CallHook(plugin, hookName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public, null);
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName)
+		public static T CallHook<T>(IPlugin plugin, string hookName)
 		{
 			return (T)CallHook(plugin, hookName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public, null);
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate)
 		{
 			return (T)Caller.CallDeprecatedHook(plugin, oldHook, newHook, expireDate, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public, null);
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1)
 		{
 			var buffer = Caller.AllocateBuffer(1);
 			buffer[0] = arg1;
@@ -150,7 +150,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1)
 		{
 			var buffer = Caller.AllocateBuffer(1);
 			buffer[0] = arg1;
@@ -160,7 +160,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1)
 		{
 			var buffer = Caller.AllocateBuffer(1);
 			buffer[0] = arg1;
@@ -170,7 +170,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2)
 		{
 			var buffer = Caller.AllocateBuffer(2);
 			buffer[0] = arg1;
@@ -181,7 +181,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2)
 		{
 			var buffer = Caller.AllocateBuffer(2);
 			buffer[0] = arg1;
@@ -192,7 +192,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2)
 		{
 			var buffer = Caller.AllocateBuffer(2);
 			buffer[0] = arg1;
@@ -203,7 +203,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3)
 		{
 			var buffer = Caller.AllocateBuffer(3);
 			buffer[0] = arg1;
@@ -215,7 +215,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3)
 		{
 			var buffer = Caller.AllocateBuffer(3);
 			buffer[0] = arg1;
@@ -227,7 +227,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3)
 		{
 			var buffer = Caller.AllocateBuffer(3);
 			buffer[0] = arg1;
@@ -239,7 +239,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4)
 		{
 			var buffer = Caller.AllocateBuffer(4);
 			buffer[0] = arg1;
@@ -252,7 +252,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4)
 		{
 			var buffer = Caller.AllocateBuffer(4);
 			buffer[0] = arg1;
@@ -265,7 +265,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4)
 		{
 			var buffer = Caller.AllocateBuffer(4);
 			buffer[0] = arg1;
@@ -278,7 +278,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5)
 		{
 			var buffer = Caller.AllocateBuffer(5);
 			buffer[0] = arg1;
@@ -292,7 +292,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5)
 		{
 			var buffer = Caller.AllocateBuffer(5);
 			buffer[0] = arg1;
@@ -306,7 +306,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5)
 		{
 			var buffer = Caller.AllocateBuffer(5);
 			buffer[0] = arg1;
@@ -320,7 +320,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
 		{
 			var buffer = Caller.AllocateBuffer(6);
 			buffer[0] = arg1;
@@ -335,7 +335,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
 		{
 			var buffer = Caller.AllocateBuffer(6);
 			buffer[0] = arg1;
@@ -350,7 +350,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6)
 		{
 			var buffer = Caller.AllocateBuffer(6);
 			buffer[0] = arg1;
@@ -365,7 +365,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7)
 		{
 			var buffer = Caller.AllocateBuffer(7);
 			buffer[0] = arg1;
@@ -381,7 +381,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7)
 		{
 			var buffer = Caller.AllocateBuffer(7);
 			buffer[0] = arg1;
@@ -397,7 +397,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7)
 		{
 			var buffer = Caller.AllocateBuffer(7);
 			buffer[0] = arg1;
@@ -413,7 +413,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8)
 		{
 			var buffer = Caller.AllocateBuffer(8);
 			buffer[0] = arg1;
@@ -430,7 +430,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8)
 		{
 			var buffer = Caller.AllocateBuffer(8);
 			buffer[0] = arg1;
@@ -447,7 +447,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8)
 		{
 			var buffer = Caller.AllocateBuffer(8);
 			buffer[0] = arg1;
@@ -464,7 +464,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static object CallHook(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, object arg9)
+		public static object CallHook(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, object arg9)
 		{
 			var buffer = Caller.AllocateBuffer(9);
 			buffer[0] = arg1;
@@ -482,7 +482,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return result;
 		}
-		public static T CallHook<T>(BaseHookable plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, object arg9)
+		public static T CallHook<T>(IPlugin plugin, string hookName, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, object arg9)
 		{
 			var buffer = Caller.AllocateBuffer(9);
 			buffer[0] = arg1;
@@ -500,7 +500,7 @@ namespace Carbon
 			Caller.ClearBuffer(buffer);
 			return (T)result;
 		}
-		public static T CallDeprecatedHook<T>(BaseHookable plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, object arg9)
+		public static T CallDeprecatedHook<T>(IPlugin plugin, string oldHook, string newHook, DateTime expireDate, object arg1, object arg2, object arg3, object arg4, object arg5, object arg6, object arg7, object arg8, object arg9)
 		{
 			var buffer = Caller.AllocateBuffer(9);
 			buffer[0] = arg1;
@@ -780,7 +780,7 @@ namespace Carbon
 			return result;
 		}
 
-		private static object CallPublicHook<T>(this T plugin, string hookName, object[] args) where T : BaseHookable
+		private static object CallPublicHook<T>(this T plugin, string hookName, object[] args) where T : IPlugin
 		{
 			return CallHook(plugin, hookName, BindingFlags.Public | BindingFlags.Instance, args);
 		}

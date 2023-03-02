@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Carbon.Base;
+using Carbon.Base.Interfaces;
 using Carbon.Hooks;
 
 namespace Carbon.Contracts
@@ -11,6 +12,6 @@ namespace Carbon.Contracts
 	public interface IModuleProcessor : IDisposable
 	{
 		void Init();
-		List<BaseHookable> Modules { get; }
+		List<IModule> Modules { get; }
 	}
 }

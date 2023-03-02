@@ -8,8 +8,10 @@ using Carbon.Base;
 using Carbon.Components;
 using Carbon.Contracts;
 using Carbon.Core;
+using Carbon.Plugins.Features;
 using Facepunch;
 using Newtonsoft.Json;
+using Oxide.Core;
 
 /*
  *
@@ -21,10 +23,12 @@ using Newtonsoft.Json;
 namespace Carbon.Plugins
 {
 	[JsonObject(MemberSerialization.OptIn)]
-	public class Plugin : BaseHookable, IDisposable
+	public class Plugin : BaseHookable, IDisposable, IPlugin
 	{
 		public bool IsCorePlugin { get; set; }
 		public bool HasConditionals { get; set; }
+
+		#region Metadata
 
 		[JsonProperty]
 		public string Title { get; set; } = "Rust";
@@ -36,8 +40,21 @@ namespace Carbon.Plugins
 		[JsonProperty]
 		public double CompileTime { get; set; }
 
+		public Persistence Persistence { get; set; }
+
 		public string FilePath { get; set; }
 		public string FileName { get; set; }
+
+		#endregion
+
+		#region Install
+
+		public virtual void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description) { }
+		public virtual void Setup(string name, string author, VersionNumber version, string description) { }
+
+		#endregion
+
+		#region Profiling
 
 		public override void TrackStart()
 		{
@@ -52,10 +69,12 @@ namespace Carbon.Plugins
 			base.TrackEnd();
 		}
 
-		public Plugin[] Requires;
-		internal Loader.CarbonMod _carbon;
-		internal IBaseProcessor _processor;
-		public IBaseProcessor.IInstance _processor_instance;
+		#endregion
+
+		public IPlugin[] Requires { get; set; }
+		internal Loader.CarbonMod CarbonMod { get; set; }
+		public IBaseProcessor Processor { get; set; }
+		public IBaseProcessor.IInstance ProcessorInstance { get; set; }
 
 		public static implicit operator bool(Plugin other)
 		{
@@ -84,7 +103,7 @@ namespace Carbon.Plugins
 
 			using (TimeMeasure.New($"Processing PluginReferences on '{this}'"))
 			{
-				_applyPluginReferences();
+				ApplyPluginReferences();
 			}
 			Logger.Debug(Name, "Assigned plugin references");
 
@@ -126,6 +145,7 @@ namespace Carbon.Plugins
 				}
 			}
 		}
+		public virtual void Unload() { }
 		public virtual void IUnload()
 		{
 			using (TimeMeasure.New($"IUnload.UnprocessHooks on '{this}'"))
@@ -156,7 +176,7 @@ namespace Carbon.Plugins
 			{
 				var mods = Pool.GetList<Loader.CarbonMod>();
 				mods.AddRange(Loader.LoadedMods);
-				var plugins = Pool.GetList<Plugin>();
+				var plugins = Pool.GetList<IPlugin>();
 
 				foreach (var mod in Loader.LoadedMods)
 				{
@@ -167,12 +187,12 @@ namespace Carbon.Plugins
 					{
 						if (plugin.Requires != null && plugin.Requires.Contains(this))
 						{
-							switch (plugin._processor)
+							switch (plugin.Processor)
 							{
 								case IScriptProcessor script:
 									Logger.Warn($" [{Name}] Unloading '{plugin.ToString()}' because parent '{ToString()}' has been unloaded.");
 									Loader.AddPendingRequiree(this, plugin);
-									plugin._processor.Get<IScriptProcessor.IScript>(plugin.FileName).Dispose();
+									plugin.Processor.Get<IScriptProcessor.IScript>(plugin.FileName).Dispose();
 									break;
 							}
 						}
@@ -183,7 +203,10 @@ namespace Carbon.Plugins
 				Pool.FreeList(ref plugins);
 			}
 		}
-		internal void _applyPluginReferences()
+		public virtual void ILoadConfig() { }
+		public virtual void ILoadDefaultMessages() { }
+
+		public void ApplyPluginReferences()
 		{
 			if (PluginReferences == null) return;
 
@@ -195,7 +218,7 @@ namespace Carbon.Plugins
 
 				var name = string.IsNullOrEmpty(attribute.Name) ? field.Name : attribute.Name;
 
-				var plugin = (Plugin)null;
+				var plugin = (IPlugin)null;
 				if (field.FieldType.Name != nameof(Plugin) &&
 					field.FieldType.Name != nameof(CarbonPlugin) &&
 					field.FieldType.Name != "RustPlugin")
@@ -217,7 +240,7 @@ namespace Carbon.Plugins
 
 		public void SetProcessor(IBaseProcessor processor)
 		{
-			_processor = processor;
+			Processor = processor;
 		}
 
 		#region Calls
@@ -385,6 +408,15 @@ namespace Carbon.Plugins
 		{
 			return HookCaller.CallHook(this, hook, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9);
 		}
+
+		#endregion
+
+		#region Logging
+
+		public void Log(object message) => Logger.Log($"[{Name}] {message}");
+		public void LogWarning(object message) => Logger.Warn($"[{Name}] {message}");
+		public void LogError(object message, Exception ex) => Logger.Error($"[{Name}] {message}", ex);
+		public void LogError(object message) => Logger.Error($"[{Name}] {message}", null);
 
 		#endregion
 
