@@ -39,7 +39,7 @@ public class WebScriptProcessor : BaseProcessor, IWebScriptProcessor
 			{
 				_loader = new ScriptLoader();
 
-				Community.Runtime.WebRequests.Enqueue(File, null, (error, result) =>
+				Community.Runtime.CorePlugin.WebRequests.Enqueue(File, null, (error, result) =>
 				{
 					Logger.Log($"Downloaded '{File}': {result.Length}");
 

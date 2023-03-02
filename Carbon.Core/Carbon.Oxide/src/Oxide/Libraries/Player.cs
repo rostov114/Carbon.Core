@@ -161,7 +161,7 @@ public class Player : Library
 		player.displayName = name;
 		player._name = name;
 		player.SendNetworkUpdateImmediate(false);
-		Community.Runtime.Permission.UpdateNickname(player.UserIDString, name);
+		Community.Runtime.CorePlugin.Permission.UpdateNickname(player.UserIDString, name);
 		Teleport(player, player.transform.position);
 	}
 

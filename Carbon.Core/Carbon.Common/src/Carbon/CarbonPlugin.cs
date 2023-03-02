@@ -12,6 +12,8 @@ using Command = Carbon.Components.Command;
 using System.IO;
 using Carbon.Features;
 using UnityEngine;
+using Carbon.Plugins.Features;
+using System.Xml.Linq;
 
 /*
  *
@@ -27,6 +29,10 @@ public class CarbonPlugin : Plugin
 	public CUI.Handler CuiHandler { get; set; }
 	public Persistence Persistence { get; set; }
 
+	public Permission Permission = new();
+	public WebRequests WebRequests = new();
+	public Timers Timers = new();
+
 	public virtual void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description)
 	{
 		_carbon = mod;
@@ -40,9 +46,6 @@ public class CarbonPlugin : Plugin
 		Description = description;
 		CuiHandler = new CUI.Handler();
 		Localisation = new Localisation(this);
-
-		Persistence = new GameObject($"Script_{name}").AddComponent<Persistence>();
-		UnityEngine.Object.DontDestroyOnLoad(Persistence.gameObject);
 	}
 
 	#region CUI
@@ -312,6 +315,13 @@ public class CarbonPlugin : Plugin
 
 	#region Internals
 
+	public override void IInit()
+	{
+		base.IInit();
+
+		Persistence = new GameObject($"Script_{Name}").AddComponent<Persistence>();
+		UnityEngine.Object.DontDestroyOnLoad(Persistence.gameObject);
+	}
 	public void ILoadConfig()
 	{
 		LoadConfig();

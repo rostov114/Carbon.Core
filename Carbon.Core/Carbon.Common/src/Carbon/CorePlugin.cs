@@ -64,10 +64,10 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var player in BasePlayer.activePlayerList)
 		{
-			Community.Runtime.Permission.RefreshPlayer(player);
+			Community.Runtime.CorePlugin.Permission.RefreshPlayer(player);
 		}
 
-		Community.Runtime.Timers.Every(5f, () =>
+		Community.Runtime.CorePlugin.Timers.Every(5f, () =>
 		{
 			if (!Logger._file._hasInit || Logger._file._buffer.Count == 0 || Community.Runtime.Config.LogFileMode != 1) return;
 			Logger._file._flush();
@@ -97,7 +97,7 @@ public class CorePlugin : CarbonPlugin
 
 	private void IOnPlayerConnected(BasePlayer player)
 	{
-		Community.Runtime.Permission.RefreshPlayer(player);
+		Community.Runtime.CorePlugin.Permission.RefreshPlayer(player);
 		HookCaller.CallStaticHook("OnPlayerConnected", player);
 	}
 	private object IOnUserApprove(Connection connection)
@@ -937,19 +937,19 @@ public class CorePlugin : CarbonPlugin
 		var action = arg.Args[0];
 		var name = arg.Args[1];
 		var perm = arg.Args[2];
-		var user = Community.Runtime.Permission.FindPlayer(name);
+		var user = Community.Runtime.CorePlugin.Permission.FindPlayer(name);
 
 		switch (action)
 		{
 			case "user":
-				if (Community.Runtime.Permission.GrantPlayerPermission(user.Key, perm, null))
+				if (Community.Runtime.CorePlugin.Permission.GrantPlayerPermission(user.Key, perm, null))
 				{
 					Reply($"Granted user '{user.Value.LastSeenNickname}' permission '{perm}'", arg);
 				}
 				break;
 
 			case "group":
-				if (Community.Runtime.Permission.GrantGroupPermission(name, perm, null))
+				if (Community.Runtime.CorePlugin.Permission.GrantGroupPermission(name, perm, null))
 				{
 					Reply($"Granted group '{name}' permission '{perm}'", arg);
 				}
@@ -980,19 +980,19 @@ public class CorePlugin : CarbonPlugin
 		var action = arg.Args[0];
 		var name = arg.Args[1];
 		var perm = arg.Args[2];
-		var user = Community.Runtime.Permission.FindPlayer(name);
+		var user = Community.Runtime.CorePlugin.Permission.FindPlayer(name);
 
 		switch (action)
 		{
 			case "user":
-				if (Community.Runtime.Permission.RevokePlayerPermission(user.Key, perm))
+				if (Community.Runtime.CorePlugin.Permission.RevokePlayerPermission(user.Key, perm))
 				{
 					Reply($"Revoked user '{user.Value?.LastSeenNickname}' permission '{perm}'", arg);
 				}
 				break;
 
 			case "group":
-				if (Community.Runtime.Permission.RevokeGroupPermission(name, perm))
+				if (Community.Runtime.CorePlugin.Permission.RevokeGroupPermission(name, perm))
 				{
 					Reply($"Revoked group '{name}' permission '{perm}'", arg);
 				}
@@ -1026,7 +1026,7 @@ public class CorePlugin : CarbonPlugin
 					if (!arg.HasArgs(2)) { PrintWarn(); return; }
 
 					var name = arg.Args[1];
-					var user = Community.Runtime.Permission.FindPlayer (name);
+					var user = Community.Runtime.CorePlugin.Permission.FindPlayer (name);
 
 					if (user.Value == null)
 					{
@@ -1044,21 +1044,21 @@ public class CorePlugin : CarbonPlugin
 
 					var name = arg.Args[1];
 
-					if (!Community.Runtime.Permission.GroupExists(name))
+					if (!Community.Runtime.CorePlugin.Permission.GroupExists(name))
 					{
 						Reply($"Couldn't find that group.", arg);
 						return;
 					}
 
-					var users = Community.Runtime.Permission.GetPlayersInGroup(name);
-					var permissions = Community.Runtime.Permission.GetGroupPermissions(name, false);
+					var users = Community.Runtime.CorePlugin.Permission.GetPlayersInGroup(name);
+					var permissions = Community.Runtime.CorePlugin.Permission.GetGroupPermissions(name, false);
 					Reply($"Group {name} has {users.Length:n0} users:\n  {users.Select(x => x).ToArray().ToString(", ", " and ")}", arg);
 					Reply($"and has {permissions.Length:n0} permissions:\n  {permissions.Select(x => x).ToArray().ToString(", ", " and ")}", arg);
 					break;
 				}
 			case "groups":
 				{
-					var groups = Community.Runtime.Permission.GetGroups();
+					var groups = Community.Runtime.CorePlugin.Permission.GetGroups();
 					if (groups.Count() == 0)
 					{
 						Reply($"Couldn't find any group.", arg);
@@ -1070,7 +1070,7 @@ public class CorePlugin : CarbonPlugin
 				}
 			case "perms":
 				{
-					var perms = Community.Runtime.Permission.GetPermissions();
+					var perms = Community.Runtime.CorePlugin.Permission.GetPermissions();
 					if (perms.Count() == 0)
 					{
 						Reply($"Couldn't find any permission.", arg);
@@ -1107,7 +1107,7 @@ public class CorePlugin : CarbonPlugin
 		var player = arg.Args[1];
 		var group = arg.Args[2];
 
-		var user = Community.Runtime.Permission.FindPlayer (player);
+		var user = Community.Runtime.CorePlugin.Permission.FindPlayer (player);
 
 		if (user.Value == null)
 		{
@@ -1115,7 +1115,7 @@ public class CorePlugin : CarbonPlugin
 			return;
 		}
 
-		if (!Community.Runtime.Permission.GroupExists(group))
+		if (!Community.Runtime.CorePlugin.Permission.GroupExists(group))
 		{
 			Reply($"Group '{group}' could not be found.", arg);
 			return;
@@ -1124,24 +1124,24 @@ public class CorePlugin : CarbonPlugin
 		switch (action)
 		{
 			case "add":
-				if (Community.Runtime.Permission.PlayerHasGroup(user.Key, group))
+				if (Community.Runtime.CorePlugin.Permission.PlayerHasGroup(user.Key, group))
 				{
 					Reply($"{user.Value.LastSeenNickname}[{user.Key}] is already in '{group}' group.", arg);
 					return;
 				}
 
-				Community.Runtime.Permission.AddPlayerGroup(user.Key, group);
+				Community.Runtime.CorePlugin.Permission.AddPlayerGroup(user.Key, group);
 				Reply($"Added {user.Value.LastSeenNickname}[{user.Key}] to '{group}' group.", arg);
 				break;
 
 			case "remove":
-				if (!Community.Runtime.Permission.PlayerHasGroup(user.Key, group))
+				if (!Community.Runtime.CorePlugin.Permission.PlayerHasGroup(user.Key, group))
 				{
 					Reply($"{user.Value.LastSeenNickname}[{user.Key}] isn't in '{group}' group.", arg);
 					return;
 				}
 
-				Community.Runtime.Permission.RemovePlayerGroup(user.Key, group);
+				Community.Runtime.CorePlugin.Permission.RemovePlayerGroup(user.Key, group);
 				Reply($"Removed {user.Value.LastSeenNickname}[{user.Key}] from '{group}' group.", arg);
 				break;
 
@@ -1176,13 +1176,13 @@ public class CorePlugin : CarbonPlugin
 
 					var group = arg.Args[1];
 
-					if (Community.Runtime.Permission.GroupExists(group))
+					if (Community.Runtime.CorePlugin.Permission.GroupExists(group))
 					{
 						Reply($"Group '{group}' already exists. To set any values for this group, use 'c.group set'.", arg);
 						return;
 					}
 
-					if (Community.Runtime.Permission.CreateGroup(group, arg.HasArgs(3) ? arg.Args[2] : group, arg.HasArgs(4) ? arg.Args[3].ToInt() : 0))
+					if (Community.Runtime.CorePlugin.Permission.CreateGroup(group, arg.HasArgs(3) ? arg.Args[2] : group, arg.HasArgs(4) ? arg.Args[3].ToInt() : 0))
 					{
 						Reply($"Created '{group}' group.", arg);
 					}
@@ -1195,7 +1195,7 @@ public class CorePlugin : CarbonPlugin
 
 					var group = arg.Args[1];
 
-					if (!Community.Runtime.Permission.GroupExists(group))
+					if (!Community.Runtime.CorePlugin.Permission.GroupExists(group))
 					{
 						Reply($"Group '{group}' does not exists.", arg);
 						return;
@@ -1207,11 +1207,11 @@ public class CorePlugin : CarbonPlugin
 					switch (set)
 					{
 						case "title":
-							Community.Runtime.Permission.SetGroupTitle(group, value);
+							Community.Runtime.CorePlugin.Permission.SetGroupTitle(group, value);
 							break;
 
 						case "rank":
-							Community.Runtime.Permission.SetGroupRank(group, value.ToInt());
+							Community.Runtime.CorePlugin.Permission.SetGroupRank(group, value.ToInt());
 							break;
 					}
 
@@ -1225,7 +1225,7 @@ public class CorePlugin : CarbonPlugin
 
 					var group = arg.Args[1];
 
-					if (Community.Runtime.Permission.RemoveGroup(group)) Reply($"Removed '{group}' group.", arg);
+					if (Community.Runtime.CorePlugin.Permission.RemoveGroup(group)) Reply($"Removed '{group}' group.", arg);
 					else Reply($"Couldn't remove '{group}' group.", arg);
 				}
 				break;
@@ -1237,7 +1237,7 @@ public class CorePlugin : CarbonPlugin
 					var group = arg.Args[1];
 					var parent = arg.Args[2];
 
-					if (Community.Runtime.Permission.SetGroupParent(group, parent)) Reply($"Changed '{group}' group's parent to '{parent}'.", arg);
+					if (Community.Runtime.CorePlugin.Permission.SetGroupParent(group, parent)) Reply($"Changed '{group}' group's parent to '{parent}'.", arg);
 					else Reply($"Couldn't change '{group}' group's parent to '{parent}'.", arg);
 				}
 				break;

@@ -33,7 +33,7 @@ public class CarbonModule<C, D> : BaseModule, IModule
 	public JsonConfig File { get; private set; }
 	public JsonConfig Data { get; private set; }
 
-	public new virtual Type Type => default;
+	public virtual Type Type => default;
 
 	public Configuration ConfigInstance { get; set; }
 	public D DataInstance { get; private set; }

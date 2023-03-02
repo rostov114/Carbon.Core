@@ -52,7 +52,7 @@ public partial class Category_Static
 									var hasPerm = cmd.Permissions.Length == 0;
 									foreach (var permission in cmd.Permissions)
 									{
-										if (cmd.Plugin is CarbonPlugin rust && Community.Runtime.Permission.PlayerHasPermission(player.UserIDString, permission))
+										if (cmd.Plugin is CarbonPlugin rust && Community.Runtime.CorePlugin.Permission.PlayerHasPermission(player.UserIDString, permission))
 										{
 											hasPerm = true;
 											break;
@@ -71,7 +71,7 @@ public partial class Category_Static
 									var hasGroup = cmd.Groups.Length == 0;
 									foreach (var group in cmd.Groups)
 									{
-										if (cmd.Plugin is CarbonPlugin rust && Community.Runtime.Permission.PlayerHasGroup(player.UserIDString, group))
+										if (cmd.Plugin is CarbonPlugin rust && Community.Runtime.CorePlugin.Permission.PlayerHasGroup(player.UserIDString, group))
 										{
 											hasGroup = true;
 											break;

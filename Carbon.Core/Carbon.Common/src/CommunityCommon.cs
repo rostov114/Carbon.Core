@@ -51,14 +51,6 @@ public class Community
 	public Loader.CarbonMod Plugins { get; set; }
 	public Entities Entities { get; set; }
 
-	#region Modding
-
-	public Permission Permission = new();
-	public WebRequests WebRequests = new();
-	public Timers Timers = new();
-
-	#endregion
-
 	public Community()
 	{
 		try

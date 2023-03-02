@@ -72,7 +72,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 			Draw(player);
 		});
 
-		RegisterTab(PermissionsTab.Get(Community.Runtime.Permission));
+		RegisterTab(PermissionsTab.Get(Community.Runtime.CorePlugin.Permission));
 		RegisterTab(PlayersTab.Get());
 		RegisterTab(CarbonTab.Get(), 0);
 
@@ -1460,7 +1460,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 
 								perms.AddName(2, "Plugins", TextAnchor.MiddleLeft);
 								{
-									foreach (var plugin in Community.Runtime.Plugins.Plugins.Where(x => Community.Runtime.Permission.GetPermissions().Any(y => y.StartsWith(x.Name.ToLower()))))
+									foreach (var plugin in Community.Runtime.Plugins.Plugins.Where(x => Community.Runtime.CorePlugin.Permission.GetPermissions().Any(y => y.StartsWith(x.Name.ToLower()))))
 									{
 										perms.AddRow(2, new Tab.OptionButton($"{plugin.Name} ({plugin.Version})", instance3 =>
 										{
@@ -1520,7 +1520,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 			perms.ClearColumn(2);
 			perms.AddName(2, "Plugins", TextAnchor.MiddleLeft);
 			{
-				foreach (var plugin in Community.Runtime.Plugins.Plugins.Where(x => Community.Runtime.Permission.GetPermissions().Any(y => y.StartsWith(x.Name.ToLower()))))
+				foreach (var plugin in Community.Runtime.Plugins.Plugins.Where(x => Community.Runtime.CorePlugin.Permission.GetPermissions().Any(y => y.StartsWith(x.Name.ToLower()))))
 				{
 					perms.AddRow(2, new Tab.OptionButton($"{plugin.Name} ({plugin.Version})", instance3 =>
 					{
@@ -1553,8 +1553,8 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 				perms.AddRow(3, new Tab.OptionButton($"{perm}", instance5 =>
 				{
 					if (permission.PlayerHasPermission(player.UserIDString, perm))
-						Community.Runtime.Permission.RevokePlayerPermission(player.UserIDString, perm);
-					else Community.Runtime.Permission.GrantPlayerPermission(player.UserIDString, perm, plugin);
+						Community.Runtime.CorePlugin.Permission.RevokePlayerPermission(player.UserIDString, perm);
+					else Community.Runtime.CorePlugin.Permission.GrantPlayerPermission(player.UserIDString, perm, plugin);
 				}, type: (_instance) => isInherited ? Tab.OptionButton.Types.Important : permission.PlayerHasPermission(player.UserIDString, perm) ? Tab.OptionButton.Types.Selected : Tab.OptionButton.Types.None));
 
 				if (isInherited)
@@ -1636,7 +1636,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 				tab.AddRow(1, new Tab.OptionButton("View Permissions", ap =>
 				{
 					var perms = Admin.FindTab("permissions");
-					var permission = Community.Runtime.Permission;
+					var permission = Community.Runtime.CorePlugin.Permission;
 					Admin.SetTab(ap.Player, "permissions");
 
 					ap.SetStorage("player", player);
