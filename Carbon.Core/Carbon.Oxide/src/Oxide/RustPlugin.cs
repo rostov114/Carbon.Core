@@ -31,7 +31,6 @@ public class RustPlugin : CarbonPlugin
 	public OxideMod mod { get; set; }
 	public WebRequests webrequest { get; set; }
 	public Oxide.Game.Rust.Libraries.Rust rust { get; set; }
-	public Persistence persistence { get; set; }
 	public CovalencePlugin.Covalence covalence { get; set; }
 
 
@@ -57,8 +56,6 @@ public class RustPlugin : CarbonPlugin
 		mod = new OxideMod();
 		rust = new Game.Rust.Libraries.Rust();
 		webrequest = new WebRequests();
-		persistence = new GameObject($"Script_{name}").AddComponent<Persistence>();
-		UnityEngine.Object.DontDestroyOnLoad(persistence.gameObject);
 		covalence = new CovalencePlugin.Covalence();
 
 		mod.Load();
@@ -70,10 +67,10 @@ public class RustPlugin : CarbonPlugin
 
 		timer.Clear();
 
-		if (persistence != null)
+		if (Persistence != null)
 		{
-			var go = persistence.gameObject;
-			UnityEngine.Object.DestroyImmediate(persistence);
+			var go = Persistence.gameObject;
+			UnityEngine.Object.DestroyImmediate(Persistence);
 			UnityEngine.Object.Destroy(go);
 		}
 
@@ -159,36 +156,6 @@ public class RustPlugin : CarbonPlugin
 	}
 
 	#endregion
-
-	protected virtual void LoadDefaultConfig()
-	{
-
-	}
-	protected virtual void SaveConfig()
-	{
-		if (Config == null)
-		{
-			return;
-		}
-		try
-		{
-			Config.Save(null);
-		}
-		catch (Exception ex)
-		{
-			Carbon.Logger.Error("Failed to save config file (does the config have illegal objects in it?) (" + ex.Message + ")", ex);
-		}
-	}
-
-	protected virtual void LoadDefaultMessages()
-	{
-
-	}
-
-	public new string ToString()
-	{
-		return $"{Name} v{Version} by {Author}";
-	}
 
 	#region Printing
 
@@ -355,5 +322,4 @@ public class RustPlugin : CarbonPlugin
 
 	#endregion
 
-	public class Persistence : FacepunchBehaviour { }
 }

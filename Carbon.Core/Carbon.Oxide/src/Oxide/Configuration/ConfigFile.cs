@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Carbon.Features;
 using Newtonsoft.Json;
 
 /*
@@ -11,28 +12,10 @@ using Newtonsoft.Json;
 
 namespace Oxide.Core.Configuration;
 
-public abstract class ConfigFile : Carbon.Plugins.Features.Config
+public abstract class ConfigFile : JsonConfig
 {
-	protected ConfigFile(string name) : base(name) { }
-
-	[JsonIgnore]
-	public string Filename { get; private set; }
-
-	public static T Load<T>(string filename) where T : ConfigFile
+	protected ConfigFile(string fileName) : base(fileName)
 	{
-		var t = (T)Activator.CreateInstance(typeof(T), filename);
-		t.Load(null);
-		return t;
-	}
 
-	public virtual void Load(string filename = null)
-	{
-		JsonConvert.PopulateObject(File.ReadAllText(filename ?? this.Filename), this);
-	}
-
-	public virtual void Save(string filename = null)
-	{
-		string contents = JsonConvert.SerializeObject(this, Formatting.Indented);
-		File.WriteAllText(filename ?? Filename, contents);
 	}
 }

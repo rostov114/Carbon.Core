@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Carbon;
 using Carbon.Base;
@@ -51,16 +52,17 @@ namespace Carbon.Plugins
 			base.TrackEnd();
 		}
 
-		internal Plugin[] _requires;
+		public Plugin[] Requires;
 		internal Loader.CarbonMod _carbon;
 		internal IBaseProcessor _processor;
+		public IBaseProcessor.IInstance _processor_instance;
 
 		public static implicit operator bool(Plugin other)
 		{
 			return other != null;
 		}
 
-		internal virtual void IInit()
+		public virtual void IInit()
 		{
 			if (HookMethods != null)
 			{
@@ -163,7 +165,7 @@ namespace Carbon.Plugins
 
 					foreach (var plugin in plugins)
 					{
-						if (plugin._requires != null && plugin._requires.Contains(this))
+						if (plugin.Requires != null && plugin.Requires.Contains(this))
 						{
 							switch (plugin._processor)
 							{
@@ -194,7 +196,9 @@ namespace Carbon.Plugins
 				var name = string.IsNullOrEmpty(attribute.Name) ? field.Name : attribute.Name;
 
 				var plugin = (Plugin)null;
-				if (field.FieldType.Name != nameof(Plugin) && field.FieldType.Name != nameof(RustPlugin))
+				if (field.FieldType.Name != nameof(Plugin) &&
+					field.FieldType.Name != nameof(CarbonPlugin) &&
+					field.FieldType.Name != "RustPlugin")
 				{
 					var info = field.FieldType.GetCustomAttribute<InfoAttribute>();
 					if (info == null)
@@ -203,9 +207,9 @@ namespace Carbon.Plugins
 						continue;
 					}
 
-					plugin = Community.Runtime.CorePlugin.plugins.Find(info.Title);
+					plugin = CarbonPlugin.Find(info.Title);
 				}
-				else plugin = Community.Runtime.CorePlugin.plugins.Find(name);
+				else plugin = CarbonPlugin.Find(name);
 
 				if (plugin != null) field.SetValue(this, plugin);
 			}

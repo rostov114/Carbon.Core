@@ -10,7 +10,8 @@ using static ConsoleSystem;
 using Facepunch;
 using Command = Carbon.Components.Command;
 using System.IO;
-using Carbon.Plugins.Features;
+using Carbon.Features;
+using UnityEngine;
 
 /*
  *
@@ -24,6 +25,7 @@ namespace Carbon.Plugins;
 public class CarbonPlugin : Plugin
 {
 	public CUI.Handler CuiHandler { get; set; }
+	public Persistence Persistence { get; set; }
 
 	public virtual void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description)
 	{
@@ -36,10 +38,11 @@ public class CarbonPlugin : Plugin
 		Version = version;
 		Author = author;
 		Description = description;
-
 		Type = GetType();
-
 		CuiHandler = new CUI.Handler();
+
+		Persistence = new GameObject($"Script_{name}").AddComponent<Persistence>();
+		UnityEngine.Object.DontDestroyOnLoad(Persistence.gameObject);
 	}
 
 	#region CUI
@@ -62,17 +65,20 @@ public class CarbonPlugin : Plugin
 
 	#region Config
 
-	public CarbonConfig Config { get; private set; }
+	public BaseFile Config { get; private set; }
+
+	public virtual Type ConfigSerializer => typeof(JsonConfig);
 
 	protected virtual void LoadConfig()
 	{
-		Config = new Config(Path.Combine(Defines.GetConfigsFolder(), Name + ".json"));
+		Config = (BaseFile)Activator.CreateInstance(ConfigSerializer, Path.Combine(Defines.GetConfigsFolder(), Name + ".json"));
 
 		if (!Config.Exists(null))
 		{
 			LoadDefaultConfig();
 			SaveConfig();
 		}
+
 		try
 		{
 			Config.Load(null);
@@ -83,13 +89,43 @@ public class CarbonPlugin : Plugin
 		}
 	}
 
+	protected virtual void SaveConfig()
+	{
+		if (Config == null)
+		{
+			return;
+		}
+		try
+		{
+			Config.Save(null);
+		}
+		catch (Exception ex)
+		{
+			Carbon.Logger.Error("Failed to save config file (does the config have illegal objects in it?) (" + ex.Message + ")", ex);
+		}
+	}
+
+	protected virtual void LoadDefaultConfig()
+	{
+
+	}
+
+	#endregion
+
+	#region Localisation
+
+	protected virtual void LoadDefaultMessages()
+	{
+
+	}
+
 	#endregion
 
 	#region Command
 
 	public static bool FromRcon { get; set; }
 
-	public void AddChatCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddChatCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		if (Community.Runtime.AllChatCommands.Count(x => x.Name == name) == 0)
 		{
@@ -101,7 +137,7 @@ public class CarbonPlugin : Plugin
 				Callback = (player, cmd, args) =>
 				{
 					try { callback.Invoke(player, cmd, args); }
-					catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin ) carbonPlugin.LogError ( "Error", ex.InnerException ?? ex ); }
+					catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin) carbonPlugin.LogError("Error", ex.InnerException ?? ex); }
 				},
 				Help = help,
 				Reference = reference,
@@ -113,7 +149,7 @@ public class CarbonPlugin : Plugin
 		}
 		else Logger.Warn($"Chat command '{name}' already exists.");
 	}
-	public void AddChatCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddChatCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		AddChatCommand(name, plugin, (player, cmd, args) =>
 		{
@@ -127,14 +163,14 @@ public class CarbonPlugin : Plugin
 				{
 					case 1:
 						{
-							if (ps.ElementAt(0).ParameterType.Name == "IPlayer") argData.Add(player.AsIPlayer()); else argData.Add(player);
+							argData.Add(player);
 							result = argData.ToArray();
 							break;
 						}
 
 					case 2:
 						{
-							if (ps.ElementAt(0).ParameterType.Name == "IPlayer") argData.Add(player.AsIPlayer()); else argData.Add(player);
+							argData.Add(player);
 							argData.Add(cmd);
 							result = argData.ToArray();
 							break;
@@ -142,7 +178,7 @@ public class CarbonPlugin : Plugin
 
 					case 3:
 						{
-							if (ps.ElementAt(0).ParameterType.Name == "IPlayer") argData.Add(player.AsIPlayer()); else argData.Add(player);
+							argData.Add(player);
 							argData.Add(cmd);
 							argData.Add(args);
 							result = argData.ToArray();
@@ -158,7 +194,7 @@ public class CarbonPlugin : Plugin
 			if (result != null) Pool.Free(ref result);
 		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 	}
-	public void AddConsoleCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddConsoleCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		if (Community.Runtime.AllConsoleCommands.Count(x => x.Name == name) == 0)
 		{
@@ -178,7 +214,7 @@ public class CarbonPlugin : Plugin
 		}
 		else Logger.Warn($"Console command '{name}' already exists.");
 	}
-	public void AddConsoleCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddConsoleCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		AddConsoleCommand(name, plugin, (player, cmd, args) =>
 		{
@@ -227,7 +263,7 @@ public class CarbonPlugin : Plugin
 			if (result != null) Pool.Free(ref result);
 		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 	}
-	public void AddConsoleCommand(string name, BaseHookable plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddConsoleCommand(string name, BaseHookable plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		AddConsoleCommand(name, plugin, (player, cmd, args) =>
 		{
@@ -248,34 +284,24 @@ public class CarbonPlugin : Plugin
 				arguments.Add(arg);
 				result = arguments.ToArray();
 
-				if (HookCaller.CallStaticHook ("OnCarbonCommand", arg) == null)
+				if (HookCaller.CallStaticHook("OnCarbonCommand", arg) == null)
 				{
 					callback.Invoke(arg);
 				}
 			}
 			catch (TargetParameterCountException) { }
-			catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin ) carbonPlugin.LogError ( "Error", ex.InnerException ?? ex ); }
+			catch (Exception ex) { if (plugin is CarbonPlugin carbonPlugin) carbonPlugin.LogError("Error", ex.InnerException ?? ex); }
 
 			Pool.FreeList(ref arguments);
 			if (result != null) Pool.Free(ref result);
 		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 	}
-	public void AddCovalenceCommand(string name, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
-	{
-		AddChatCommand(name, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
-		AddConsoleCommand(name, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
-	}
-	public void AddCovalenceCommand(string name, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
-	{
-		AddChatCommand(name, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
-		AddConsoleCommand(name, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
-	}
 
-	public void RemoveChatCommand(string name, BaseHookable plugin = null)
+	public static void RemoveChatCommand(string name, BaseHookable plugin = null)
 	{
 		Community.Runtime.AllChatCommands.RemoveAll(x => x.Name == name && (plugin == null || x.Plugin == plugin));
 	}
-	public void RemoveConsoleCommand(string name, BaseHookable plugin = null)
+	public static void RemoveConsoleCommand(string name, BaseHookable plugin = null)
 	{
 		Community.Runtime.AllConsoleCommands.RemoveAll(x => x.Name == name && (plugin == null || x.Plugin == plugin));
 	}
@@ -294,4 +320,49 @@ public class CarbonPlugin : Plugin
 	}
 
 	#endregion
+
+	#region Plugins
+
+	public static bool Exists(string name)
+	{
+		return Community.Runtime.Plugins.Plugins.Any(x => x.Name == name);
+	}
+
+	public static CarbonPlugin Find(string name)
+	{
+		name = name.Replace(" ", "");
+
+		foreach (var mod in Loader.LoadedMods)
+		{
+			foreach (var plugin in mod.Plugins)
+			{
+				if (plugin.Name.Replace(" ", "").Replace(".", "") == name) return plugin;
+			}
+		}
+
+		return null;
+	}
+
+	public static CarbonPlugin[] GetAll()
+	{
+		var list = Pool.GetList<CarbonPlugin>();
+		foreach (var mod in Loader.LoadedMods)
+		{
+			list.AddRange(mod.Plugins);
+		}
+
+		var result = list.ToArray();
+		Pool.FreeList(ref list);
+		return result;
+	}
+
+	#endregion
+
+	public new string ToString()
+	{
+		return $"{Name} v{Version} by {Author}";
+	}
+
 }
+
+public class Persistence : FacepunchBehaviour { }

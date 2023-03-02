@@ -9,13 +9,10 @@ using Carbon.Base.Interfaces;
 using Carbon.Components;
 using Carbon.Contracts;
 using Carbon.Extensions;
-using Carbon.Hooks;
 using Carbon.Plugins;
 using Facepunch;
 using Network;
 using Newtonsoft.Json;
-using Oxide.Core;
-using Oxide.Plugins;
 using UnityEngine;
 
 /*
@@ -51,7 +48,7 @@ public class CorePlugin : CarbonPlugin
 		return null;
 	}
 
-	public override void IInit()
+	internal override void IInit()
 	{
 		Hooks = new List<string>()
 		{
@@ -67,10 +64,10 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var player in BasePlayer.activePlayerList)
 		{
-			permission.RefreshUser(player);
+			Community.Permission.RefreshPlayer(player);
 		}
 
-		timer.Every(5f, () =>
+		Community.Timers.Every(5f, () =>
 		{
 			if (!Logger._file._hasInit || Logger._file._buffer.Count == 0 || Community.Runtime.Config.LogFileMode != 1) return;
 			Logger._file._flush();
@@ -100,14 +97,14 @@ public class CorePlugin : CarbonPlugin
 
 	private void IOnPlayerConnected(BasePlayer player)
 	{
-		permission.RefreshUser(player);
+		Community.Permission.RefreshPlayer(player);
 		HookCaller.CallStaticHook("OnPlayerConnected", player);
 	}
 	private object IOnUserApprove(Connection connection)
 	{
 		var username = connection.username;
 		var text = connection.userid.ToString();
-		var obj = Regex.Replace(connection.ipaddress, global::Oxide.Game.Rust.Libraries.Player.ipPattern, "");
+		var obj = Regex.Replace(connection.ipaddress, NetworkEx.IpPattern, "");
 		var authLevel = connection.authLevel;
 
 		var canClient = HookCaller.CallStaticHook("CanClientLogin", connection);
@@ -132,7 +129,7 @@ public class CorePlugin : CarbonPlugin
 			return null;
 		}
 
-		if (Interface.CallHook("OnEntityTakeDamage", basePlayer, hitInfo) != null)
+		if (HookCaller.CallStaticHook("OnEntityTakeDamage", basePlayer, hitInfo) != null)
 		{
 			return true;
 		}
@@ -324,7 +321,7 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var mod in Loader.LoadedMods)
 		{
-			var plugins = Pool.GetList<RustPlugin>();
+			var plugins = Pool.GetList<CarbonPlugin>();
 			plugins.AddRange(mod.Plugins);
 
 			foreach (var plugin in plugins)
@@ -361,7 +358,7 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var mod in Loader.LoadedMods)
 		{
-			var plugins = Pool.GetList<RustPlugin>();
+			var plugins = Pool.GetList<CarbonPlugin>();
 			plugins.AddRange(mod.Plugins);
 
 			foreach (var plugin in plugins)
@@ -616,7 +613,7 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var command in Community.Runtime.AllConsoleCommands)
 		{
-			if (!string.IsNullOrEmpty(filter) && !command.Command.Contains(filter)) continue;
+			if (!string.IsNullOrEmpty(filter) && !command.Name.Contains(filter)) continue;
 
 			var value = " ";
 
@@ -626,7 +623,7 @@ public class CorePlugin : CarbonPlugin
 				else if (command.Reference is PropertyInfo property) value = property.GetValue(command.Plugin)?.ToString();
 			}
 
-			body.AddRow(command.Command, value, command.Help);
+			body.AddRow(command.Name, value, command.Help);
 		}
 
 		Reply($"Console Commands:\n{body.ToStringMinimal()}", arg);
@@ -642,9 +639,9 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var command in Community.Runtime.AllChatCommands)
 		{
-			if (!string.IsNullOrEmpty(filter) && !command.Command.Contains(filter)) continue;
+			if (!string.IsNullOrEmpty(filter) && !command.Name.Contains(filter)) continue;
 
-			body.AddRow(command.Command, command.Help);
+			body.AddRow(command.Name, command.Help);
 		}
 
 		Reply($"Chat Commands:\n{body.ToStringMinimal()}", arg);
@@ -777,7 +774,7 @@ public class CorePlugin : CarbonPlugin
 
 				foreach (var mod in Loader.LoadedMods)
 				{
-					var plugins = Pool.GetList<RustPlugin>();
+					var plugins = Pool.GetList<CarbonPlugin>();
 					plugins.AddRange(mod.Plugins);
 
 					foreach (var plugin in plugins)
@@ -899,7 +896,7 @@ public class CorePlugin : CarbonPlugin
 
 				foreach (var mod in Loader.LoadedMods)
 				{
-					var plugins = Pool.GetList<RustPlugin>();
+					var plugins = Pool.GetList<CarbonPlugin>();
 					plugins.AddRange(mod.Plugins);
 
 					foreach (var plugin in plugins)
@@ -940,19 +937,19 @@ public class CorePlugin : CarbonPlugin
 		var action = arg.Args[0];
 		var name = arg.Args[1];
 		var perm = arg.Args[2];
-		var user = permission.FindUser(name);
+		var user = Community.Permission.FindPlayer(name);
 
 		switch (action)
 		{
 			case "user":
-				if (permission.GrantUserPermission(user.Key, perm, null))
+				if (Community.Permission.GrantPlayerPermission(user.Key, perm, null))
 				{
 					Reply($"Granted user '{user.Value.LastSeenNickname}' permission '{perm}'", arg);
 				}
 				break;
 
 			case "group":
-				if (permission.GrantGroupPermission(name, perm, null))
+				if (Community.Permission.GrantGroupPermission(name, perm, null))
 				{
 					Reply($"Granted group '{name}' permission '{perm}'", arg);
 				}
@@ -983,19 +980,19 @@ public class CorePlugin : CarbonPlugin
 		var action = arg.Args[0];
 		var name = arg.Args[1];
 		var perm = arg.Args[2];
-		var user = permission.FindUser(name);
+		var user = Community.Permission.FindPlayer(name);
 
 		switch (action)
 		{
 			case "user":
-				if (permission.RevokeUserPermission(user.Key, perm))
+				if (Community.Permission.RevokePlayerPermission(user.Key, perm))
 				{
 					Reply($"Revoked user '{user.Value?.LastSeenNickname}' permission '{perm}'", arg);
 				}
 				break;
 
 			case "group":
-				if (permission.RevokeGroupPermission(name, perm))
+				if (Community.Permission.RevokeGroupPermission(name, perm))
 				{
 					Reply($"Revoked group '{name}' permission '{perm}'", arg);
 				}
@@ -1029,7 +1026,7 @@ public class CorePlugin : CarbonPlugin
 					if (!arg.HasArgs(2)) { PrintWarn(); return; }
 
 					var name = arg.Args[1];
-					var user = permission.FindUser(name);
+					var user = Community.Permission.FindPlayer (name);
 
 					if (user.Value == null)
 					{
@@ -1047,21 +1044,21 @@ public class CorePlugin : CarbonPlugin
 
 					var name = arg.Args[1];
 
-					if (!permission.GroupExists(name))
+					if (!Community.Permission.GroupExists(name))
 					{
 						Reply($"Couldn't find that group.", arg);
 						return;
 					}
 
-					var users = permission.GetUsersInGroup(name);
-					var permissions = permission.GetGroupPermissions(name, false);
+					var users = Community.Permission.GetPlayersInGroup(name);
+					var permissions = Community.Permission.GetGroupPermissions(name, false);
 					Reply($"Group {name} has {users.Length:n0} users:\n  {users.Select(x => x).ToArray().ToString(", ", " and ")}", arg);
 					Reply($"and has {permissions.Length:n0} permissions:\n  {permissions.Select(x => x).ToArray().ToString(", ", " and ")}", arg);
 					break;
 				}
 			case "groups":
 				{
-					var groups = permission.GetGroups();
+					var groups = Community.Permission.GetGroups();
 					if (groups.Count() == 0)
 					{
 						Reply($"Couldn't find any group.", arg);
@@ -1073,7 +1070,7 @@ public class CorePlugin : CarbonPlugin
 				}
 			case "perms":
 				{
-					var perms = permission.GetPermissions();
+					var perms = Community.Permission.GetPermissions();
 					if (perms.Count() == 0)
 					{
 						Reply($"Couldn't find any permission.", arg);
@@ -1110,7 +1107,7 @@ public class CorePlugin : CarbonPlugin
 		var player = arg.Args[1];
 		var group = arg.Args[2];
 
-		var user = permission.FindUser(player);
+		var user = Community.Permission.FindPlayer (player);
 
 		if (user.Value == null)
 		{
@@ -1118,7 +1115,7 @@ public class CorePlugin : CarbonPlugin
 			return;
 		}
 
-		if (!permission.GroupExists(group))
+		if (!Community.Permission.GroupExists(group))
 		{
 			Reply($"Group '{group}' could not be found.", arg);
 			return;
@@ -1127,24 +1124,24 @@ public class CorePlugin : CarbonPlugin
 		switch (action)
 		{
 			case "add":
-				if (permission.UserHasGroup(user.Key, group))
+				if (Community.Permission.PlayerHasGroup(user.Key, group))
 				{
 					Reply($"{user.Value.LastSeenNickname}[{user.Key}] is already in '{group}' group.", arg);
 					return;
 				}
 
-				permission.AddUserGroup(user.Key, group);
+				Community.Permission.AddPlayerGroup(user.Key, group);
 				Reply($"Added {user.Value.LastSeenNickname}[{user.Key}] to '{group}' group.", arg);
 				break;
 
 			case "remove":
-				if (!permission.UserHasGroup(user.Key, group))
+				if (!Community.Permission.PlayerHasGroup(user.Key, group))
 				{
 					Reply($"{user.Value.LastSeenNickname}[{user.Key}] isn't in '{group}' group.", arg);
 					return;
 				}
 
-				permission.RemoveUserGroup(user.Key, group);
+				Community.Permission.RemovePlayerGroup(user.Key, group);
 				Reply($"Removed {user.Value.LastSeenNickname}[{user.Key}] from '{group}' group.", arg);
 				break;
 
@@ -1179,13 +1176,13 @@ public class CorePlugin : CarbonPlugin
 
 					var group = arg.Args[1];
 
-					if (permission.GroupExists(group))
+					if (Community.Permission.GroupExists(group))
 					{
 						Reply($"Group '{group}' already exists. To set any values for this group, use 'c.group set'.", arg);
 						return;
 					}
 
-					if (permission.CreateGroup(group, arg.HasArgs(3) ? arg.Args[2] : group, arg.HasArgs(4) ? arg.Args[3].ToInt() : 0))
+					if (Community.Permission.CreateGroup(group, arg.HasArgs(3) ? arg.Args[2] : group, arg.HasArgs(4) ? arg.Args[3].ToInt() : 0))
 					{
 						Reply($"Created '{group}' group.", arg);
 					}
@@ -1198,7 +1195,7 @@ public class CorePlugin : CarbonPlugin
 
 					var group = arg.Args[1];
 
-					if (!permission.GroupExists(group))
+					if (!Community.Permission.GroupExists(group))
 					{
 						Reply($"Group '{group}' does not exists.", arg);
 						return;
@@ -1210,11 +1207,11 @@ public class CorePlugin : CarbonPlugin
 					switch (set)
 					{
 						case "title":
-							permission.SetGroupTitle(group, value);
+							Community.Permission.SetGroupTitle(group, value);
 							break;
 
 						case "rank":
-							permission.SetGroupRank(group, value.ToInt());
+							Community.Permission.SetGroupRank(group, value.ToInt());
 							break;
 					}
 
@@ -1228,7 +1225,7 @@ public class CorePlugin : CarbonPlugin
 
 					var group = arg.Args[1];
 
-					if (permission.RemoveGroup(group)) Reply($"Removed '{group}' group.", arg);
+					if (Community.Permission.RemoveGroup(group)) Reply($"Removed '{group}' group.", arg);
 					else Reply($"Couldn't remove '{group}' group.", arg);
 				}
 				break;
@@ -1240,7 +1237,7 @@ public class CorePlugin : CarbonPlugin
 					var group = arg.Args[1];
 					var parent = arg.Args[2];
 
-					if (permission.SetGroupParent(group, parent)) Reply($"Changed '{group}' group's parent to '{parent}'.", arg);
+					if (Community.Permission.SetGroupParent(group, parent)) Reply($"Changed '{group}' group's parent to '{parent}'.", arg);
 					else Reply($"Couldn't change '{group}' group's parent to '{parent}'.", arg);
 				}
 				break;

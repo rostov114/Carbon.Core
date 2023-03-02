@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Carbon;
+using Carbon.Plugins;
 using Facepunch;
 using Oxide.Core.Libraries;
 using static Oxide.Plugins.RustPlugin;
@@ -27,7 +28,7 @@ public class Timers
 
 	public bool IsValid()
 	{
-		return Plugin != null && Plugin.persistence != null;
+		return Plugin != null && Plugin.Persistence != null;
 	}
 	public void Clear()
 	{
@@ -40,7 +41,7 @@ public class Timers
 		_timers = null;
 	}
 
-	public Persistence Persistence => Plugin.persistence;
+	public Persistence Persistence => Plugin.Persistence;
 
 	public Timer In(float time, Action action)
 	{

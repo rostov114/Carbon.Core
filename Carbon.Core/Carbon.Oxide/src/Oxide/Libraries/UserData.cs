@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using Carbon.Features;
 using ProtoBuf;
 
 /*
@@ -11,11 +11,7 @@ using ProtoBuf;
 namespace Oxide.Core.Libraries;
 
 [ProtoContract(ImplicitFields = ImplicitFields.AllFields)]
-public class UserData
+public class UserData : Player
 {
-	public string LastSeenNickname { get; set; } = "Unnamed";
-	public string Language { get; set; } = "en";
 
-	public HashSet<string> Perms { get; set; } = new HashSet<string>();
-	public HashSet<string> Groups { get; set; } = new HashSet<string>();
 }

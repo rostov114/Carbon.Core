@@ -5,8 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Carbon;
 using Oxide.Game.Rust.Libraries.Covalence;
-using Oxide.Plugins;
-using Plugin = Carbon.Plugin;
+using Plugin = Carbon.Plugins.Plugin;
 
 /*
  *
@@ -17,14 +16,8 @@ using Plugin = Carbon.Plugin;
 
 namespace Oxide.Core.Libraries;
 
-public class Permission : Library
+public class Permission : Carbon.Features.Permission
 {
-	public enum SerializationMode
-	{
-		Protobuf,
-		SQL
-	}
-
 	public bool IsGlobal
 	{
 		get

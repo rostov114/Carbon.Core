@@ -9,7 +9,9 @@ using Carbon.Components;
 using Carbon.Contracts;
 using Carbon.Core;
 using Carbon.Extensions;
+using Carbon.Features;
 using Carbon.Plugins;
+using Carbon.Plugins.Features;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -48,6 +50,14 @@ public class Community
 	public CarbonPlugin CorePlugin { get; set; }
 	public Loader.CarbonMod Plugins { get; set; }
 	public Entities Entities { get; set; }
+
+	#region Modding
+
+	public static Permission Permission = new();
+	public static WebRequests WebRequests = new();
+	public static Timers Timers = new();
+
+	#endregion
 
 	public Community()
 	{

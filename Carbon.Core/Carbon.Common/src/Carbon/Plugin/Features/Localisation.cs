@@ -2,9 +2,10 @@
 using System.IO;
 using Carbon.Core;
 using Carbon.Extensions;
+using Carbon.Plugins;
 using Newtonsoft.Json;
 
-namespace Carbon.Plugins.Features
+namespace Carbon.Features
 {
 	public class Localisation
 	{
@@ -27,7 +28,7 @@ namespace Carbon.Plugins.Features
 
 		public string GetLanguage(string userId)
 		{
-			if (!string.IsNullOrEmpty(userId) && Interface.Oxide.Permission.UserExists(userId, out var data))
+			if (!string.IsNullOrEmpty(userId) && Community.Permission.PlayerExists(userId, out var data))
 			{
 				return data.Language;
 			}
@@ -38,7 +39,7 @@ namespace Carbon.Plugins.Features
 		{
 			var list = Facepunch.Pool.GetList<string>();
 
-			foreach (string text in Directory.GetDirectories(Defines.GetLangFolder () ))
+			foreach (var text in Directory.GetDirectories(Defines.GetLangFolder () ))
 			{
 				if (Directory.GetFiles(text).Length != 0 && (plugin == null || (plugin != null && OsEx.File.Exists(Path.Combine(text, plugin.Name + ".json")))))
 				{
@@ -54,10 +55,10 @@ namespace Carbon.Plugins.Features
 		{
 			if (string.IsNullOrEmpty(lang) || string.IsNullOrEmpty(userId)) return;
 
-			if (Interface.Oxide.Permission.UserExists(userId, out var data))
+			if (Community.Permission.PlayerExists(userId, out var data))
 			{
 				data.Language = lang;
-				Interface.Oxide.Permission.SaveData();
+				Community.Permission.SaveData();
 			}
 		}
 		public void SetServerLanguage(string lang)
@@ -71,7 +72,8 @@ namespace Carbon.Plugins.Features
 		{
 			return Community.Runtime.Config.Language;
 		}
-		private Dictionary<string, string> GetMessageFile(string plugin, string lang = "en")
+
+		internal Dictionary<string, string> GetMessageFile(string plugin, string lang = "en")
 		{
 			if (string.IsNullOrEmpty(plugin)) return null;
 
@@ -91,7 +93,7 @@ namespace Carbon.Plugins.Features
 
 			return JsonConvert.DeserializeObject<Dictionary<string, string>>(OsEx.File.ReadText(path));
 		}
-		private void SaveMessageFile(string plugin, string lang = "en")
+		internal void SaveMessageFile(string plugin, string lang = "en")
 		{
 			if (Phrases.TryGetValue(lang, out var messages))
 			{

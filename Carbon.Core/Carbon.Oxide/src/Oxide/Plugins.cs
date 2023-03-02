@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Carbon;
 using Carbon.Core;
+using Carbon.Plugins;
 using Facepunch;
 
 /*
@@ -16,34 +17,16 @@ public class Plugins
 {
 	public bool Exists(string name)
 	{
-		return Community.Runtime.Plugins.Plugins.Any(x => x.Name == name);
+		return CarbonPlugin.Exists(name);
 	}
 
-	public Plugin Find(string name)
+	public CarbonPlugin Find(string name)
 	{
-		name = name.Replace(" ", "");
-
-		foreach (var mod in Loader.LoadedMods)
-		{
-			foreach (var plugin in mod.Plugins)
-			{
-				if (plugin.Name.Replace(" ", "").Replace(".", "") == name) return plugin;
-			}
-		}
-
-		return null;
+		return CarbonPlugin.Find(name);
 	}
 
-	public Plugin[] GetAll()
+	public CarbonPlugin[] GetAll()
 	{
-		var list = Pool.GetList<Plugin>();
-		foreach (var mod in Loader.LoadedMods)
-		{
-			list.AddRange(mod.Plugins);
-		}
-
-		var result = list.ToArray();
-		Pool.FreeList(ref list);
-		return result;
+		return CarbonPlugin.GetAll();
 	}
 }

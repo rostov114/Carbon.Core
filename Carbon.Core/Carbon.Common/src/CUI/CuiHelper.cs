@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Carbon;
 using Newtonsoft.Json;
 using Oxide.Core;
 using UnityEngine;
@@ -34,7 +35,7 @@ public static class CuiHelper
 
 	public static bool AddUi(BasePlayer player, string json)
 	{
-		if (player?.net != null && Interface.CallHook("CanUseUI", player, json) == null)
+		if (player?.net != null && HookCaller.CallStaticHook("CanUseUI", player, json) == null)
 		{
 			CommunityEntity.ServerInstance.ClientRPCEx(new Network.SendInfo { connection = player.net.connection }, null, "AddUI", json);
 			return true;
@@ -47,7 +48,7 @@ public static class CuiHelper
 	{
 		if (player?.net != null)
 		{
-			Interface.CallHook("OnDestroyUI", player, name);
+			HookCaller.CallStaticHook("OnDestroyUI", player, name);
 			CommunityEntity.ServerInstance.ClientRPCEx(new Network.SendInfo { connection = player.net.connection }, null, "DestroyUI", name);
 			return true;
 		}

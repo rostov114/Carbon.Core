@@ -2,10 +2,12 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Carbon;
+using Carbon.Extensions;
 using Network;
 using Oxide.Core.Libraries;
 using Oxide.Core.Libraries.Covalence;
 using UnityEngine;
+using Permission = Oxide.Core.Libraries.Permission;
 
 /*
  *
@@ -18,9 +20,6 @@ namespace Oxide.Game.Rust.Libraries;
 
 public class Player : Library
 {
-	internal static readonly string ipPattern = ":{1}[0-9]{1}\\d*";
-	internal Permission permission => Community.Runtime.CorePlugin.permission;
-
 	public CultureInfo Language(BasePlayer player)
 	{
 		try
@@ -35,7 +34,7 @@ public class Player : Library
 
 	public string Address(Connection connection)
 	{
-		return Regex.Replace(connection.ipaddress, ipPattern, "");
+		return Regex.Replace(connection.ipaddress, NetworkEx.IpPattern, "");
 	}
 	public string Address(BasePlayer player)
 	{
@@ -162,7 +161,7 @@ public class Player : Library
 		player.displayName = name;
 		player._name = name;
 		player.SendNetworkUpdateImmediate(false);
-		permission.UpdateNickname(player.UserIDString, name);
+		Community.Permission.UpdateNickname(player.UserIDString, name);
 		Teleport(player, player.transform.position);
 	}
 

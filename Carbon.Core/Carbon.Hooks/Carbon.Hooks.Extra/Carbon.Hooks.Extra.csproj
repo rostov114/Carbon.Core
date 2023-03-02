@@ -10,6 +10,7 @@
 
 	<ItemGroup>
 		<!-- Carbon platform -->
+		<ProjectReference Include="..\..\Carbon.Oxide\Carbon.Oxide.csproj" />
 		<ProjectReference Include="..\..\Carbon\Carbon.csproj" Private="false" />
 
 		<!-- Assembly patcher -->

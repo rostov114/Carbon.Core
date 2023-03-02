@@ -8,8 +8,8 @@ using System.Net;
 using Carbon.Base;
 using Carbon.Core;
 using Carbon.Extensions;
+using Carbon.Plugins.Features;
 using Facepunch;
-using Oxide.Core.Libraries;
 using ProtoBuf;
 using QRCoder;
 
@@ -189,7 +189,7 @@ public class ImageDatabaseModule : CarbonModule<ImageDatabaseConfig, ImageDataba
 
 		if (Config.PrintInitializedBatchLogs && thread.ImageUrls.Count > 0) Puts($"Added {thread.ImageUrls.Count:n0} to the queue (scale: {(scale == 0 ? "default" : $"{scale:0.0}")})...");
 
-		Community.Runtime.CorePlugin.persistence.StartCoroutine(_executeQueue(thread, results =>
+		Community.Runtime.CorePlugin.Persistence.StartCoroutine(_executeQueue(thread, results =>
 		{
 			try
 			{

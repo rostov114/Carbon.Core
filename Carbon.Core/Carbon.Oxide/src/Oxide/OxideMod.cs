@@ -56,10 +56,6 @@ public class OxideMod
 			case Permission.SerializationMode.Protobuf:
 				Permission = new Permission();
 				break;
-
-			case Permission.SerializationMode.SQL:
-				Permission = new PermissionSql();
-				break;
 		}
 	}
 

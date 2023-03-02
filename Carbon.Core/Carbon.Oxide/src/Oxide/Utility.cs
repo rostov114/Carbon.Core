@@ -41,7 +41,7 @@ public class Utility
 
 			if (deleteAfter)
 			{
-				File.Delete(dataFileSystem.GetFile(name).Filename);
+				File.Delete(dataFileSystem.GetFile(name).FileName);
 			}
 		}
 		catch (Exception ex)

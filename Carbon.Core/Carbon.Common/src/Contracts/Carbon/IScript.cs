@@ -6,8 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Carbon.Base;
 using Carbon.Hooks;
+using Carbon.Plugins;
 using Oxide.Core;
-using Oxide.Plugins;
 
 namespace Carbon.Contracts
 {
@@ -22,7 +22,7 @@ namespace Carbon.Contracts
 		string Description { get; set; }
 		string Source { get; set; }
 		IScriptLoader Loader { get; set; }
-		RustPlugin Instance { get; set; }
+		CarbonPlugin Instance { get; set; }
 		bool IsCore { get; set; }
 	}
 }

@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carbon.Extensions
+namespace Carbon.Common.src.Carbon.Plugin.Features
 {
-	public class NetworkEx
+	internal class CUI
 	{
-		public static readonly string IpPattern = ":{1}[0-9]{1}\\d*";
 	}
 }

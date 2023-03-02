@@ -12,9 +12,9 @@ using Carbon.Contracts;
 using Carbon.Core;
 using Carbon.Extensions;
 using Carbon.Jobs;
+using Carbon.Plugins;
 using Facepunch;
 using Oxide.Core;
-using Oxide.Plugins;
 using UnityEngine;
 
 /*
@@ -178,7 +178,7 @@ public class ScriptLoader : IDisposable, IScriptLoader
 		var noRequiresFound = false;
 		foreach (var require in AsyncLoader.Requires)
 		{
-			var plugin = Community.Runtime.CorePlugin.plugins.Find(require);
+			var plugin = CarbonPlugin.Find(require);
 			if (plugin == null)
 			{
 				Logger.Warn($"Couldn't find required plugin '{require}' for '{(!string.IsNullOrEmpty(File) ? Path.GetFileNameWithoutExtension(File) : "<unknown>")}'");
@@ -279,7 +279,7 @@ public class ScriptLoader : IDisposable, IScriptLoader
 				plugin.Version = info.Version;
 				plugin.Description = description?.Description;
 
-				if (Loader.InitializePlugin(type, out RustPlugin rustPlugin, Mod, preInit: p =>
+				if (Loader.InitializePlugin(type, out CarbonPlugin rustPlugin, Mod, preInit: p =>
 					{
 						p._processor_instance = Instance;
 
@@ -358,7 +358,7 @@ public class ScriptLoader : IDisposable, IScriptLoader
 		public string Description { get; set; }
 		public string Source { get; set; }
 		public IScriptLoader Loader { get; set; }
-		public RustPlugin Instance { get; set; }
+		public CarbonPlugin Instance { get; set; }
 		public bool IsCore { get; set; }
 
 		public static Script Create(string source, Assembly assembly, Type type)

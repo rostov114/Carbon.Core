@@ -15,6 +15,11 @@ namespace Oxide.Core
 		public static OxideMod Oxide { get; set; } = new OxideMod();
 		public static OxideMod uMod => Oxide;
 
+		public static Interface()
+		{
+
+		}
+
 		public static void Initialize()
 		{
 			Oxide.Load();

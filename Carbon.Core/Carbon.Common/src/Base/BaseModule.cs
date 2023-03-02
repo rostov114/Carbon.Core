@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using Carbon.Base.Interfaces;
 using Carbon.Core;
-using Oxide.Core.Configuration;
+using Carbon.Features;
 
 /*
  *
@@ -30,8 +30,8 @@ public class BaseModule : BaseHookable
 }
 public class CarbonModule<C, D> : BaseModule, IModule
 {
-	public DynamicConfigFile File { get; private set; }
-	public DynamicConfigFile Data { get; private set; }
+	public JsonConfig File { get; private set; }
+	public JsonConfig Data { get; private set; }
 
 	public new virtual Type Type => default;
 
@@ -68,8 +68,8 @@ public class CarbonModule<C, D> : BaseModule, IModule
 
 		Loader.ProcessCommands(Type, this, flags: BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-		File = new DynamicConfigFile(Path.Combine(Defines.GetModulesFolder(), Name, "config.json"));
-		Data = new DynamicConfigFile(Path.Combine(Defines.GetModulesFolder(), Name, "data.json"));
+		File = new JsonConfig(Path.Combine(Defines.GetModulesFolder(), Name, "config.json"));
+		Data = new JsonConfig(Path.Combine(Defines.GetModulesFolder(), Name, "data.json"));
 
 		Load();
 		if (ConfigInstance.Enabled) OnEnableStatus();

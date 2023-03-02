@@ -504,4 +504,13 @@ public static class StringEx
 	}
 
 	#endregion
+
+	#region Other
+
+	public static string Sanitize(this string text)
+	{
+		return text.Replace("{", "{{").Replace("}", "}}");
+	}
+
+	#endregion
 }

@@ -17,6 +17,8 @@ public class DataFileSystem
 {
 	public string Directory { get; private set; }
 
+	internal readonly Dictionary<string, DynamicConfigFile> _datafiles;
+
 	public DataFileSystem(string directory)
 	{
 		Directory = directory;
@@ -95,6 +97,4 @@ public class DataFileSystem
 			}
 		}
 	}
-
-	private readonly Dictionary<string, DynamicConfigFile> _datafiles;
 }
