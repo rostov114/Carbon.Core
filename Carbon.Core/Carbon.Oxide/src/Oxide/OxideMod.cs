@@ -114,7 +114,7 @@ public class OxideMod
 		var type = typeof(T);
 
 		if (type == typeof(Permission)) return Community.Runtime.Permission as T;
-		else if (type == typeof(Lang)) return Community.Runtime.Localisation as T;
+		else if (type == typeof(Lang)) return Community.Runtime.CorePlugin.Localisation as T;
 		else if (type == typeof(Game.Rust.Libraries.Command)) return Interface.Oxide.Command as T;
 		else if (type == typeof(Game.Rust.Libraries.Rust)) return Interface.Oxide.Rust as T;
 

@@ -15,7 +15,7 @@ namespace Carbon.Features
 		void Load(string fileName);
 		void Save(string fileName);
 
-		T ReadObject<T>(string fileName);
+		T ReadObject<T>(string fileName = null);
 		void WriteObject<T>(T config, bool async = false, string fileName = null);
 
 		bool Exists(string fileName);

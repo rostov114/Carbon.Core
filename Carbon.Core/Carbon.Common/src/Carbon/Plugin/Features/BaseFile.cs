@@ -10,7 +10,7 @@ namespace Carbon.Features
 	{
 		public BaseFile(string fileName)
 		{
-
+			FileName = fileName;
 		}
 
 		public string FileName { get; set; }
@@ -21,9 +21,9 @@ namespace Carbon.Features
 
 		public abstract void Load(string fileName);
 
-		public abstract T ReadObject<T>(string fileName);
-
 		public abstract void Save(string fileName);
+
+		public abstract T ReadObject<T>(string fileName = null);
 
 		public abstract void WriteObject<T>(T value, bool async = false, string fileName = null);
 	}

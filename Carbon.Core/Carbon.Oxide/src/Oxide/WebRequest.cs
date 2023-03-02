@@ -31,7 +31,7 @@ public class WebRequests
 		ServicePointManager.DefaultConnectionLimit = 200;
 	}
 
-	public WebRequest Enqueue(string url, string body, Action<int, string> callback, Plugin owner, RequestMethod method = RequestMethod.GET, Dictionary<string, string> headers = null, float timeout = 0f)
+	public WebRequest Enqueue(string url, string body, Action<int, string> callback, Carbon.Plugins.Plugin owner, RequestMethod method = RequestMethod.GET, Dictionary<string, string> headers = null, float timeout = 0f)
 	{
 		return new WebRequest(url, callback, owner)
 		{
@@ -43,19 +43,19 @@ public class WebRequests
 	}
 
 	[Obsolete("EnqueueGet is deprecated, use Enqueue instead")]
-	public void EnqueueGet(string url, Action<int, string> callback, Plugin owner, Dictionary<string, string> headers = null, float timeout = 0f)
+	public void EnqueueGet(string url, Action<int, string> callback, Carbon.Plugins.Plugin owner, Dictionary<string, string> headers = null, float timeout = 0f)
 	{
 		Enqueue(url, null, callback, owner, RequestMethod.GET, headers, timeout);
 	}
 
 	[Obsolete("EnqueuePost is deprecated, use Enqueue instead")]
-	public void EnqueuePost(string url, string body, Action<int, string> callback, Plugin owner, Dictionary<string, string> headers = null, float timeout = 0f)
+	public void EnqueuePost(string url, string body, Action<int, string> callback, Carbon.Plugins.Plugin owner, Dictionary<string, string> headers = null, float timeout = 0f)
 	{
 		Enqueue(url, body, callback, owner, RequestMethod.POST, headers, timeout);
 	}
 
 	[Obsolete("EnqueuePut is deprecated, use Enqueue instead")]
-	public void EnqueuePut(string url, string body, Action<int, string> callback, Plugin owner, Dictionary<string, string> headers = null, float timeout = 0f)
+	public void EnqueuePut(string url, string body, Action<int, string> callback, Carbon.Plugins.Plugin owner, Dictionary<string, string> headers = null, float timeout = 0f)
 	{
 		Enqueue(url, body, callback, owner, RequestMethod.PUT, headers, timeout);
 	}
@@ -74,13 +74,13 @@ public class WebRequests
 		public string ResponseText { get; protected set; }
 		public Exception ResponseError { get; protected set; }
 
-		public Plugin Owner { get; protected set; }
+		public Carbon.Plugins.Plugin Owner { get; protected set; }
 		public Dictionary<string, string> RequestHeaders { get; set; }
 
 		internal Uri _uri;
 		internal Client _client;
 
-		public WebRequest(string url, Action<int, string> callback, Plugin owner)
+		public WebRequest(string url, Action<int, string> callback, Carbon.Plugins.Plugin owner)
 		{
 			Url = url;
 			SuccessCallback = callback;

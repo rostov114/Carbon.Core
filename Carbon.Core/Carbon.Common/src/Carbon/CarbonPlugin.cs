@@ -38,8 +38,8 @@ public class CarbonPlugin : Plugin
 		Version = version;
 		Author = author;
 		Description = description;
-		Type = GetType();
 		CuiHandler = new CUI.Handler();
+		Localisation = new Localisation(this);
 
 		Persistence = new GameObject($"Script_{name}").AddComponent<Persistence>();
 		UnityEngine.Object.DontDestroyOnLoad(Persistence.gameObject);
@@ -113,6 +113,8 @@ public class CarbonPlugin : Plugin
 	#endregion
 
 	#region Localisation
+
+	public Localisation Localisation { get; internal set; }
 
 	protected virtual void LoadDefaultMessages()
 	{

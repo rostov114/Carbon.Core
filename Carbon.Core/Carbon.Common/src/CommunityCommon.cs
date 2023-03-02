@@ -56,7 +56,6 @@ public class Community
 	public Permission Permission = new();
 	public WebRequests WebRequests = new();
 	public Timers Timers = new();
-	public Localisation Localisation = new(null);
 
 	#endregion
 

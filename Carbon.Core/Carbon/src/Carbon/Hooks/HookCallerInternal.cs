@@ -95,7 +95,7 @@ namespace Carbon.Hooks
 			{
 				plugin.HookCache.Add(id, hooks = new List<MethodInfo>());
 
-				foreach (var method in plugin.Type.GetMethods(flags))
+				foreach (var method in plugin.GetType().GetMethods(flags))
 				{
 					if (method.Name != hookName) continue;
 

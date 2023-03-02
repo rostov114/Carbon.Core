@@ -58,7 +58,6 @@ public class CarbonModule<C, D> : BaseModule, IModule
 	public virtual void Init()
 	{
 		base.Name = Name;
-		base.Type = Type;
 
 		foreach (var method in Type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.NonPublic))
 		{

@@ -11,32 +11,29 @@ using Carbon.Core;
 
 namespace Carbon.Features
 {
-	public class JsonConfig : IFileSerializer
+	public class JsonConfig : BaseFile
 	{
-		public string FileName { get; set; }
 
 		public JsonSerializerSettings Settings { get; } = new();
 
 		protected Dictionary<string, object> _keyvalues;
 		protected readonly JsonSerializerSettings _settings;
 
-		public JsonConfig(string fileName)
+		public JsonConfig(string fileName) : base(fileName)
 		{
-			FileName = fileName;
-
 			_keyvalues = new Dictionary<string, object>();
 			_settings = new JsonSerializerSettings();
 			_settings.Converters.Add(new KeyValuesConverter());
 		}
 
-		public void Load(string filename = null)
+		public override void Load(string filename = null)
 		{
 			filename = ValidatePath(filename ?? FileName);
 
 			var value = File.ReadAllText(filename);
 			_keyvalues = JsonConvert.DeserializeObject<Dictionary<string, object>>(value, _settings);
 		}
-		public void Save(string filename = null)
+		public override void Save(string filename = null)
 		{
 			filename = ValidatePath(filename ?? FileName);
 
@@ -48,7 +45,7 @@ namespace Carbon.Features
 			File.WriteAllText(filename, JsonConvert.SerializeObject(_keyvalues, Formatting.Indented, _settings));
 		}
 
-		public T ReadObject<T>(string filename = null)
+		public override T ReadObject<T>(string filename = null)
 		{
 			filename = ValidatePath(filename ?? FileName);
 
@@ -64,7 +61,7 @@ namespace Carbon.Features
 			}
 			return t;
 		}
-		public void WriteObject<T>(T config, bool sync = false, string fileName = null)
+		public override void WriteObject<T>(T config, bool sync = false, string fileName = null)
 		{
 			if (config == null) config = Activator.CreateInstance<T>();
 
@@ -83,7 +80,7 @@ namespace Carbon.Features
 			}
 		}
 
-		public bool Exists(string fileName = null)
+		public override bool Exists(string fileName = null)
 		{
 			fileName = ValidatePath(fileName ?? FileName);
 
@@ -123,7 +120,7 @@ namespace Carbon.Features
 			return SanitizeName(name);
 		}
 
-		public void Clear()
+		public override void Clear()
 		{
 			_keyvalues.Clear();
 		}
