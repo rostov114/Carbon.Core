@@ -3,11 +3,11 @@ using System.IO;
 using Carbon.Extensions;
 using Carbon.Core;
 using Oxide.Core;
+using Oxide.Core.Configuration;
 using Oxide.Core.Libraries;
 using Oxide.Game.Rust.Libraries;
 using UnityEngine;
 using Carbon.Plugins;
-using WebRequests = Oxide.Core.Libraries.WebRequests;
 using Carbon.Contracts;
 
 /*
@@ -31,8 +31,11 @@ public class RustPlugin : Plugin, IPlugin
 	public Timers timer { get; set; }
 	public OxideMod mod { get; set; }
 	public WebRequests webrequest { get; set; }
-	public Game.Rust.Libraries.Rust rust { get; set; }
+	public Oxide.Game.Rust.Libraries.Rust rust { get; set; }
+	public Persistence persistence { get; set; }
 	public CovalencePlugin.Covalence covalence { get; set; }
+
+	public DynamicConfigFile Config { get; private set; }
 
 	public Player Player { get { return rust.Player; } private set { } }
 	public Server Server { get { return rust.Server; } private set { } }
@@ -42,9 +45,19 @@ public class RustPlugin : Plugin, IPlugin
 		Setup($"Core Plugin {RandomEx.GetRandomString(5)}", "Carbon Community", new VersionNumber(1, 0, 0), string.Empty);
 	}
 
+	public override void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description)
+	{
+		base.SetupMod(mod, name, author, version, description);
+
+		Setup(name, author, version, description);	
+	}
+
 	public override void Setup(string name, string author, VersionNumber version, string description)
 	{
-		base.Setup(name, author, version, description);
+		Name = name;
+		Version = version;
+		Author = author;
+		Description = description;
 
 		permission = Interface.Oxide.Permission;
 		cmd = new Command();
@@ -56,24 +69,22 @@ public class RustPlugin : Plugin, IPlugin
 		mod = new OxideMod();
 		rust = new Game.Rust.Libraries.Rust();
 		webrequest = new WebRequests();
+		persistence = new GameObject($"Script_{name}").AddComponent<Persistence>();
+		UnityEngine.Object.DontDestroyOnLoad(persistence.gameObject);
 		covalence = new CovalencePlugin.Covalence();
-
-		Persistence = new GameObject($"Script_{Name}").AddComponent<Persistence>();
-		UnityEngine.Object.DontDestroyOnLoad(Persistence.gameObject);
 
 		mod.Load();
 	}
-
 	public override void Dispose()
 	{
 		permission.UnregisterPermissions(this);
 
 		timer.Clear();
 
-		if (Persistence != null)
+		if (persistence != null)
 		{
-			var go = Persistence.gameObject;
-			UnityEngine.Object.DestroyImmediate(Persistence);
+			var go = persistence.gameObject;
+			UnityEngine.Object.DestroyImmediate(persistence);
 			UnityEngine.Object.Destroy(go);
 		}
 
@@ -159,6 +170,63 @@ public class RustPlugin : Plugin, IPlugin
 	}
 
 	#endregion
+
+	public override void ILoadConfig()
+	{
+		LoadConfig();
+	}
+	public override void ILoadDefaultMessages()
+	{
+		CallHook("LoadDefaultMessages");
+	}
+
+	protected virtual void LoadConfig()
+	{
+		Config = new DynamicConfigFile(Path.Combine(Manager.ConfigPath, Name + ".json"));
+
+		if (!Config.Exists(null))
+		{
+			LoadDefaultConfig();
+			SaveConfig();
+		}
+		try
+		{
+			Config.Load(null);
+		}
+		catch (Exception ex)
+		{
+			Carbon.Logger.Error("Failed to load config file (is the config file corrupt?) (" + ex.Message + ")");
+		}
+	}
+	protected virtual void LoadDefaultConfig()
+	{
+		//CallHook ( "LoadDefaultConfig" );
+	}
+	protected virtual void SaveConfig()
+	{
+		if (Config == null)
+		{
+			return;
+		}
+		try
+		{
+			Config.Save(null);
+		}
+		catch (Exception ex)
+		{
+			Carbon.Logger.Error("Failed to save config file (does the config have illegal objects in it?) (" + ex.Message + ")", ex);
+		}
+	}
+
+	protected virtual void LoadDefaultMessages()
+	{
+
+	}
+
+	public new string ToString()
+	{
+		return $"{Name} v{Version} by {Author}";
+	}
 
 	#region Printing
 
@@ -324,5 +392,4 @@ public class RustPlugin : Plugin, IPlugin
 	}
 
 	#endregion
-
 }
