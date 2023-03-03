@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.Serialization;
 using Carbon;
 using Carbon.Base;
+using Carbon.Contracts;
 using Carbon.Plugins;
 using Oxide.Core;
 using Oxide.Core.Libraries;
@@ -25,11 +26,11 @@ namespace Oxide.Game.Rust.Libraries
 	{
 		public static bool FromRcon { get; set; }
 
-		public void AddChatCommand(string command, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddChatCommand(string command, IMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			CarbonPlugin.AddChatCommand(command, plugin, callback, skipOriginal, help, reference,permissions, groups, authLevel, cooldown);
 		}
-		public void AddChatCommand(string command, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddChatCommand(string command, IMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			AddChatCommand(command, plugin, (player, cmd, args) =>
 			{
@@ -74,34 +75,34 @@ namespace Oxide.Game.Rust.Libraries
 				if (result != null) Pool.Free(ref result);
 			}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 		}
-		public void AddConsoleCommand(string command, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddConsoleCommand(string command, IMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			CarbonPlugin.AddConsoleCommand(command, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 		}
-		public void AddConsoleCommand(string command, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddConsoleCommand(string command, IMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			CarbonPlugin.AddConsoleCommand(command, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 		}
-		public void AddConsoleCommand(string command, BaseHookable plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddConsoleCommand(string command, IMetadata plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			CarbonPlugin.AddConsoleCommand(command, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 		}
-		public void AddCovalenceCommand(string command, BaseHookable plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddCovalenceCommand(string command, IMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			AddChatCommand(command, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 			AddConsoleCommand(command, plugin, method, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 		}
-		public void AddCovalenceCommand(string command, BaseHookable plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+		public void AddCovalenceCommand(string command, IMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 		{
 			AddChatCommand(command, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 			AddConsoleCommand(command, plugin, callback, skipOriginal, help, reference, permissions, groups, authLevel, cooldown );
 		}
 
-		public void RemoveChatCommand(string command, BaseHookable plugin = null)
+		public void RemoveChatCommand(string command, IMetadata plugin = null)
 		{
 			CarbonPlugin.RemoveChatCommand(command, plugin);
 		}
-		public void RemoveConsoleCommand(string command, BaseHookable plugin = null)
+		public void RemoveConsoleCommand(string command, IMetadata plugin = null)
 		{
 			CarbonPlugin.RemoveConsoleCommand(command, plugin);
 		}

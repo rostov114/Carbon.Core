@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Carbon.Base;
 using Carbon.Components;
+using Carbon.Contracts;
 using Carbon.Extensions;
 using Carbon.Features;
 using Carbon.Plugins;
@@ -1534,7 +1535,7 @@ public class AdminModule : CarbonModule<AdminConfig, AdminData>
 			}
 		}
 
-		public static void GeneratePermissions(Tab perms, Permission permission, CarbonPlugin plugin, BasePlayer player)
+		public static void GeneratePermissions(Tab perms, Permission permission, IPlugin plugin, BasePlayer player)
 		{
 			perms.ClearColumn(3);
 			perms.AddName(3, "Permissions", TextAnchor.MiddleLeft);

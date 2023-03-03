@@ -13,7 +13,7 @@ namespace Carbon.Components
 		public static bool FromRcon { get; set; }
 
 		public string Name { get; set; }
-		public IPluginMetadata Plugin { get; set; }
+		public IMetadata Plugin { get; set; }
 		public Action<BasePlayer, string, string[]> Callback { get; set; }
 		public string[] Permissions { get; set; }
 		public string[] Groups { get; set; }

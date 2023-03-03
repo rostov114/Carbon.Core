@@ -246,7 +246,7 @@ public static class Loader
 		return IsValidPlugin(type.BaseType);
 	}
 
-	public static void ProcessCommands(Type type, IPluginMetadata plugin = null, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance, string prefix = null)
+	public static void ProcessCommands(Type type, IMetadata plugin = null, BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Instance, string prefix = null)
 	{
 		var methods = type.GetMethods(flags);
 		var fields = type.GetFields(flags | BindingFlags.Public);

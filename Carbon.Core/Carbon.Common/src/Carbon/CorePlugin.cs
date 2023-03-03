@@ -321,7 +321,7 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var mod in Loader.LoadedMods)
 		{
-			var plugins = Pool.GetList<CarbonPlugin>();
+			var plugins = Pool.GetList<IPlugin>();
 			plugins.AddRange(mod.Plugins);
 
 			foreach (var plugin in plugins)
@@ -358,7 +358,7 @@ public class CorePlugin : CarbonPlugin
 
 		foreach (var mod in Loader.LoadedMods)
 		{
-			var plugins = Pool.GetList<CarbonPlugin>();
+			var plugins = Pool.GetList<IPlugin>();
 			plugins.AddRange(mod.Plugins);
 
 			foreach (var plugin in plugins)
@@ -774,7 +774,7 @@ public class CorePlugin : CarbonPlugin
 
 				foreach (var mod in Loader.LoadedMods)
 				{
-					var plugins = Pool.GetList<CarbonPlugin>();
+					var plugins = Pool.GetList<IPlugin>();
 					plugins.AddRange(mod.Plugins);
 
 					foreach (var plugin in plugins)
@@ -896,7 +896,7 @@ public class CorePlugin : CarbonPlugin
 
 				foreach (var mod in Loader.LoadedMods)
 				{
-					var plugins = Pool.GetList<CarbonPlugin>();
+					var plugins = Pool.GetList<IPlugin>();
 					plugins.AddRange(mod.Plugins);
 
 					foreach (var plugin in plugins)

@@ -3,6 +3,7 @@ using System.Linq;
 using Carbon;
 using Carbon.Oxide;
 using Carbon.Plugins;
+using Oxide.Core;
 using Oxide.Core.Libraries.Covalence;
 using Oxide.Game.Rust.Libraries.Covalence;
 
@@ -70,7 +71,7 @@ namespace Oxide.Plugins
 
 			public void UnregisterCommand(string command, Plugin plugin)
 			{
-				RemoveConsoleCommand(command, plugin);
+				Interface.Oxide.Command.RemoveConsoleCommand(command, plugin);
 			}
 		}
 

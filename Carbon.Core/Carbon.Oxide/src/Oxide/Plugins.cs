@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Carbon;
+using Carbon.Contracts;
 using Carbon.Core;
 using Carbon.Plugins;
 using Facepunch;
@@ -20,12 +21,12 @@ public class Plugins
 		return CarbonPlugin.Exists(name);
 	}
 
-	public CarbonPlugin Find(string name)
+	public IPlugin Find(string name)
 	{
 		return CarbonPlugin.Find(name);
 	}
 
-	public CarbonPlugin[] GetAll()
+	public IPlugin[] GetAll()
 	{
 		return CarbonPlugin.GetAll();
 	}

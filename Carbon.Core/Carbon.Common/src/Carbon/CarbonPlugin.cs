@@ -121,7 +121,7 @@ public class CarbonPlugin : Plugin
 
 	public static bool FromRcon { get; set; }
 
-	public static void AddChatCommand(string name, IPluginMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddChatCommand(string name, IMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		if (Community.Runtime.AllChatCommands.Count(x => x.Name == name) == 0)
 		{
@@ -145,7 +145,7 @@ public class CarbonPlugin : Plugin
 		}
 		else Logger.Warn($"Chat command '{name}' already exists.");
 	}
-	public static void AddChatCommand(string name, IPluginMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddChatCommand(string name, IMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		AddChatCommand(name, plugin, (player, cmd, args) =>
 		{
@@ -190,7 +190,7 @@ public class CarbonPlugin : Plugin
 			if (result != null) Pool.Free(ref result);
 		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 	}
-	public static void AddConsoleCommand(string name, IPluginMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddConsoleCommand(string name, IMetadata plugin, Action<BasePlayer, string, string[]> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		if (Community.Runtime.AllConsoleCommands.Count(x => x.Name == name) == 0)
 		{
@@ -210,7 +210,7 @@ public class CarbonPlugin : Plugin
 		}
 		else Logger.Warn($"Console command '{name}' already exists.");
 	}
-	public static void AddConsoleCommand(string name, IPluginMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddConsoleCommand(string name, IMetadata plugin, string method, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		AddConsoleCommand(name, plugin, (player, cmd, args) =>
 		{
@@ -259,7 +259,7 @@ public class CarbonPlugin : Plugin
 			if (result != null) Pool.Free(ref result);
 		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 	}
-	public static void AddConsoleCommand(string name, IPluginMetadata plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
+	public static void AddConsoleCommand(string name, IMetadata plugin, Func<Arg, bool> callback, bool skipOriginal = true, string help = null, object reference = null, string[] permissions = null, string[] groups = null, int authLevel = -1, int cooldown = 0)
 	{
 		AddConsoleCommand(name, plugin, (player, cmd, args) =>
 		{
@@ -293,11 +293,11 @@ public class CarbonPlugin : Plugin
 		}, skipOriginal, help, reference, permissions, groups, authLevel, cooldown);
 	}
 
-	public static void RemoveChatCommand(string name, IPluginMetadata plugin = null)
+	public static void RemoveChatCommand(string name, IMetadata plugin = null)
 	{
 		Community.Runtime.AllChatCommands.RemoveAll(x => x.Name == name && (plugin == null || x.Plugin == plugin));
 	}
-	public static void RemoveConsoleCommand(string name, IPluginMetadata plugin = null)
+	public static void RemoveConsoleCommand(string name, IMetadata plugin = null)
 	{
 		Community.Runtime.AllConsoleCommands.RemoveAll(x => x.Name == name && (plugin == null || x.Plugin == plugin));
 	}

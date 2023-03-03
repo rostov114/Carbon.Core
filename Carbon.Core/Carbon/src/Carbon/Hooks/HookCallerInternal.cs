@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Carbon.Contracts;
 
 namespace Carbon.Hooks
 {
@@ -114,11 +115,14 @@ namespace Carbon.Hooks
 				catch (TargetParameterCountException) { }
 				catch (Exception ex)
 				{
-					var exception = ex.InnerException ?? ex;
-					Carbon.Logger.Error(
-						$"Failed to call hook '{hookName}' on plugin '{plugin.Name} v{plugin.Version}'",
-						exception
-					);
+					if (plugin is IPlugin contract)
+					{
+						var exception = ex.InnerException ?? ex;
+						Carbon.Logger.Error(
+							$"Failed to call hook '{hookName}' on plugin '{contract.Name} v{contract.Version}'",
+							exception
+						);
+					}
 				}
 			}
 
@@ -146,7 +150,10 @@ namespace Carbon.Hooks
 
 				if (afterTicks > beforeTicks + 100 && afterTicks > beforeTicks)
 				{
-					Carbon.Logger.Warn($" {plugin?.Name} hook took longer than 100ms {hookName} [{totalTicks:0}ms]");
+					if (plugin is IMetadata metadata)
+					{
+						Carbon.Logger.Warn($" {metadata?.Name} hook took longer than 100ms {hookName} [{totalTicks:0}ms]");
+					}
 				}
 
 				return result;
@@ -167,7 +174,10 @@ namespace Carbon.Hooks
 			{
 				_lastDeprecatedWarningAt[oldHook] = now;
 
-				Carbon.Logger.Warn($"'{plugin.Name} v{plugin.Version}' is using deprecated hook '{oldHook}', which will stop working on {expireDate.ToString("D")}. Please ask the author to update to '{newHook}'");
+				if (plugin is IPlugin metadata)
+				{
+					Carbon.Logger.Warn($"'{metadata.Name} v{metadata.Version}' is using deprecated hook '{oldHook}', which will stop working on {expireDate.ToString("D")}. Please ask the author to update to '{newHook}'");
+				}
 			}
 
 			return CallDeprecatedHook(plugin, oldHook, newHook, expireDate, flags, args);

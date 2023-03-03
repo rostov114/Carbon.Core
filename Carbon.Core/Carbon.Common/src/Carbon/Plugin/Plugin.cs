@@ -37,9 +37,6 @@ namespace Carbon.Plugins
 		[JsonProperty]
 		public string Author { get; set; }
 
-		[JsonProperty]
-		public double CompileTime { get; set; }
-
 		public Persistence Persistence { get; set; }
 
 		public string FilePath { get; set; }
@@ -55,6 +52,9 @@ namespace Carbon.Plugins
 		#endregion
 
 		#region Profiling
+
+		[JsonProperty]
+		public float CompileTime { get; set; }
 
 		public override void TrackStart()
 		{

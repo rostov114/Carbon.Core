@@ -15,7 +15,7 @@ using Carbon.Features;
 
 namespace Carbon.Base;
 
-public class BaseModule : BaseHookable, IPluginMetadata
+public abstract class BaseModule : BaseHookable, IMetadata, IModule
 {
 	public virtual bool EnabledByDefault => false;
 
@@ -28,8 +28,22 @@ public class BaseModule : BaseHookable, IPluginMetadata
 
 		return default;
 	}
+
+	public abstract bool GetEnabled();
+
+	public abstract void Init();
+	public abstract void InitEnd();
+	public abstract void Load();
+	public abstract void Save();
+
+	public abstract void SetEnabled(bool enabled);
+	public abstract void OnDisabled(bool initialized);
+	public abstract void OnEnabled(bool initialized);
+	public abstract void OnEnableStatus();
+
+	public abstract void Dispose();
 }
-public class CarbonModule<C, D> : BaseModule, IHookableModule
+public class CarbonModule<C, D> : BaseModule, IHookable
 {
 	public JsonConfig File { get; private set; }
 	public JsonConfig Data { get; private set; }
@@ -50,13 +64,13 @@ public class CarbonModule<C, D> : BaseModule, IHookableModule
 	protected void PutsWarn(object message)
 		=> Logger.Warn($"[{Name}] {message}");
 
-	public virtual void Dispose()
+	public override void Dispose()
 	{
 		File = null;
 		ConfigInstance = null;
 	}
 
-	public virtual void Init()
+	public override void Init()
 	{
 		base.Name = Name;
 
@@ -74,11 +88,11 @@ public class CarbonModule<C, D> : BaseModule, IHookableModule
 		Load();
 		if (ConfigInstance.Enabled) OnEnableStatus();
 	}
-	public virtual void InitEnd()
+	public override void InitEnd()
 	{
 		Puts($"Initialized.");
 	}
-	public virtual void Load()
+	public override void Load()
 	{
 		var shouldSave = false;
 
@@ -115,7 +129,7 @@ public class CarbonModule<C, D> : BaseModule, IHookableModule
 	{
 		return false;
 	}
-	public virtual void Save()
+	public override void Save()
 	{
 		if (ConfigInstance == null)
 		{
@@ -132,7 +146,7 @@ public class CarbonModule<C, D> : BaseModule, IHookableModule
 		Data.WriteObject(DataInstance);
 	}
 
-	public void SetEnabled(bool enable)
+	public override void SetEnabled(bool enable)
 	{
 		if (ConfigInstance != null)
 		{
@@ -140,15 +154,15 @@ public class CarbonModule<C, D> : BaseModule, IHookableModule
 			OnEnableStatus();
 		}
 	}
-	public bool GetEnabled()
+	public override bool GetEnabled()
 	{
 		return ConfigInstance.Enabled;
 	}
 
-	public virtual void OnDisabled(bool initialized) { }
-	public virtual void OnEnabled(bool initialized) { }
+	public override void OnDisabled(bool initialized) { }
+	public override void OnEnabled(bool initialized) { }
 
-	public void OnEnableStatus()
+	public override void OnEnableStatus()
 	{
 		try
 		{

@@ -30,14 +30,14 @@ public class BaseHookable
 	[JsonProperty]
 	public VersionNumber Version { get; set; }
 
-	[JsonProperty]
-	public double TotalHookTime { get; internal set; }
-
 	public bool HasInitialized { get; set; }
 
 	#region Tracking
 
 	internal Stopwatch _trackStopwatch = new Stopwatch();
+
+	[JsonProperty]
+	public double TotalHookTime { get; set; }
 
 	public virtual void TrackStart()
 	{

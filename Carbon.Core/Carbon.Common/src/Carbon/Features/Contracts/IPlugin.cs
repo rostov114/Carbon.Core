@@ -7,7 +7,7 @@ using Oxide.Core;
 
 namespace Carbon.Contracts
 {
-	public interface IPlugin : IPluginMetadata, IDisposable
+	public interface IPlugin : IMetadata, IHookable, IDisposable
 	{
 		string Author { get; set; }
 		VersionNumber Version { get; set; }
@@ -15,15 +15,10 @@ namespace Carbon.Contracts
 		string FilePath { get; set; }
 		string FileName { get; set; }
 
-		double CompileTime { get; set; }
+		float CompileTime { get; set; }
+		double TotalHookTime { get; set; }
 
 		IPlugin[] Requires { get; set; }
-		List<string> Hooks { get; set; }
-		List<HookMethodAttribute> HookMethods { get; set; }
-		List<PluginReferenceAttribute> PluginReferences { get; set; }
-		Dictionary<string, List<MethodInfo>> HookCache { get; set; }
-		Dictionary<string, List<MethodInfo>> HookMethodAttributeCache { get; set; }
-		List<string> IgnoredHooks { get; set; }
 
 		IBaseProcessor Processor { get; set; }
 		IBaseProcessor.IInstance ProcessorInstance { get; set; }
@@ -37,10 +32,6 @@ namespace Carbon.Contracts
 
 		void SetupMod(Loader.CarbonMod mod, string name, string author, VersionNumber version, string description);
 		void Setup(string name, string author, VersionNumber version, string description);
-
-		void Subscribe(string hook);
-		void Unsubscribe(string hook);
-		bool IsHookIgnored(string hook);	
 
 		void ILoadConfig();
 		void ILoadDefaultMessages();
@@ -56,13 +47,6 @@ namespace Carbon.Contracts
 		void LogError(object message, Exception exception = null);
 		void LogWarning(object message);
 		void LogError(object message);
-
-		#endregion
-
-		#region Profiling
-
-		void TrackStart();
-		void TrackEnd();
 
 		#endregion
 

@@ -17,9 +17,9 @@ namespace Carbon.Processors;
 
 public class ModuleProcessor : IDisposable, IModuleProcessor
 {
-	List<BaseHookable> IModuleProcessor.Modules { get => _modules; }
+	List<IModule> IModuleProcessor.Modules { get => _modules; }
 
-	internal List<BaseHookable> _modules { get; set; } = new List<BaseHookable>(50);
+	internal List<IModule> _modules { get; set; } = new List<IModule>(50);
 
 	public void Init()
 	{
@@ -27,10 +27,10 @@ public class ModuleProcessor : IDisposable, IModuleProcessor
 		{
 			if (type.BaseType == null || !type.BaseType.Name.Contains("CarbonModule")) continue;
 
-			Setup(Activator.CreateInstance(type) as BaseHookable);
+			Setup(Activator.CreateInstance(type) as IModule);
 		}
 	}
-	public void Setup(BaseHookable module)
+	public void Setup(IModule module)
 	{
 		if (module is IModule hookable)
 		{

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Carbon.Contracts
 {
-	public interface IPluginMetadata
+	public interface IMetadata
 	{
 		string Name { get; set; }
 	}

@@ -34,8 +34,6 @@ public class RustPlugin : Plugin, IPlugin
 	public Game.Rust.Libraries.Rust rust { get; set; }
 	public CovalencePlugin.Covalence covalence { get; set; }
 
-	public IBaseProcessor Processor { get; set; }
-
 	public Player Player { get { return rust.Player; } private set { } }
 	public Server Server { get { return rust.Server; } private set { } }
 

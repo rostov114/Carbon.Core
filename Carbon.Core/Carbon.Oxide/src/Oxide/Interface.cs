@@ -17,10 +17,7 @@ namespace Oxide.Core
 
 		public Interface()
 		{
-			Community.Runtime.Events.Subscribe(API.Events.CarbonEvent.OnServerSave, args =>
-			{
-				Interface.Oxide.Permission.SaveData();
-			});
+
 			Initialize();
 		}
 
@@ -34,6 +31,17 @@ namespace Oxide.Core
 			Logger.Log($"  Lang Directory: {Oxide.LangDirectory}");
 			Logger.Log($"  Log Directory: {Oxide.LogDirectory}");
 			Logger.Log($"  Plugin Directory: {Oxide.PluginDirectory}");
+
+			Community.Runtime.Events.Subscribe(API.Events.CarbonEvent.OnServerSave, SaveData);
+		}
+		public static void ShutDown()
+		{
+			Community.Runtime.Events.Unsubscribe(API.Events.CarbonEvent.OnServerSave, SaveData);
+		}
+
+		internal static void SaveData(EventArgs args)
+		{
+			Oxide.Permission.SaveData();
 		}
 
 		public static OxideMod GetMod() => Oxide;

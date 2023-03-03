@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using API.Events;
+using Carbon.Contracts;
 using Carbon.Core;
+using Carbon.Extensions;
 using Carbon.Hooks;
 using Carbon.Plugins;
 using Carbon.Processors;
@@ -40,7 +43,7 @@ public class CommunityInternal : Community
 		Plugins = new Loader.CarbonMod { Name = "Scripts", IsCoreMod = true };
 		CorePlugin.IInit();
 
-		Loader.LoadedMods.Add(new Loader.CarbonMod { Name = "Carbon Community", IsCoreMod = true, Plugins = new List<CarbonPlugin> { CorePlugin } });
+		Loader.LoadedMods.Add(new Loader.CarbonMod { Name = "Carbon Community", IsCoreMod = true, Plugins = new List<IPlugin> { CorePlugin } });
 		Loader.LoadedMods.Add(Plugins);
 
 		Loader.ProcessCommands(typeof(CorePlugin), CorePlugin, prefix: "c");
@@ -95,6 +98,27 @@ public class CommunityInternal : Community
 
 	#endregion
 
+	public void InstallExtensions()
+	{
+		foreach(var type in AccessToolsEx.AllTypes().Where(x => x is IExtension))
+		{
+			if(type is IExtension installer)
+			{
+				installer.Install();
+			}
+		}
+	}
+	public void UninstallExtensions()
+	{
+		foreach (var type in AccessToolsEx.AllTypes().Where(x => x is IExtension))
+		{
+			if (type is IExtension installer)
+			{
+				installer.Uninstall();
+			}
+		}
+	}
+
 	public void Initialize()
 	{
 		if (IsInitialized) return;
@@ -130,6 +154,8 @@ public class CommunityInternal : Community
 
 			_installProcessors();
 
+			InstallExtensions();
+
 			RefreshConsoleInfo();
 
 			IsInitialized = true;
@@ -144,6 +170,8 @@ public class CommunityInternal : Community
 		try
 		{
 			Events.Trigger(CarbonEvent.CarbonShutdown, EventArgs.Empty);
+
+			UninstallExtensions();
 
 			_uninstallProcessors();
 			ClearCommands(all: true);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Carbon.Contracts;
 using Carbon.Extensions;
 using Carbon.Plugins;
 using Epic.OnlineServices.UI;
@@ -20,7 +21,7 @@ namespace Carbon.Features
 		internal static char[] Star = new char[] { '*' };
 		internal static string[] EmptyStringArray = new string[0];
 
-		protected readonly Dictionary<Plugin, HashSet<string>> _permissions;
+		protected readonly Dictionary<IPlugin, HashSet<string>> _permissions;
 		protected Dictionary<string, Player> _players = new();
 		protected Dictionary<string, Group> _groups = new();
 		protected Func<string, bool> _validator;
@@ -211,7 +212,7 @@ namespace Carbon.Features
 			}
 		}
 
-		public virtual void RegisterPermission(string name, Plugin owner)
+		public virtual void RegisterPermission(string name, IPlugin owner)
 		{
 			if (string.IsNullOrEmpty(name)) return;
 
@@ -231,7 +232,7 @@ namespace Carbon.Features
 			HookCaller.CallStaticHook("OnPermissionRegistered", name, owner);
 		}
 
-		public virtual void UnregisterPermissions(Plugin owner)
+		public virtual void UnregisterPermissions(IPlugin owner)
 		{
 			if (owner == null) return;
 
@@ -243,7 +244,7 @@ namespace Carbon.Features
 			}
 		}
 
-		public virtual bool PermissionExists(string name, Plugin owner = null)
+		public virtual bool PermissionExists(string name, IPlugin owner = null)
 		{
 			if (string.IsNullOrEmpty(name))
 			{
@@ -515,7 +516,7 @@ namespace Carbon.Features
 			return groupData.Rank;
 		}
 
-		public virtual bool GrantPlayerPermission(string id, string perm, Plugin owner)
+		public virtual bool GrantPlayerPermission(string id, string perm, IPlugin owner)
 		{
 			if (!PermissionExists(perm, owner)) return false;
 
@@ -577,7 +578,7 @@ namespace Carbon.Features
 				return true;
 			}
 		}
-		public virtual bool GrantGroupPermission(string name, string perm, Plugin owner)
+		public virtual bool GrantGroupPermission(string name, string perm, IPlugin owner)
 		{
 			if (!PermissionExists(perm, owner) || !GroupExists(name)) return false;
 

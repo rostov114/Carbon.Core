@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Carbon.Contracts;
 
@@ -11,11 +12,12 @@ using Carbon.Contracts;
 
 namespace Carbon.Base.Interfaces;
 
-public interface IModule : IInitializable, IPluginMetadata
+public interface IModule : IInitializable, IHookable, IMetadata, IDisposable
 {
 	void Init();
 	void InitEnd();
 	void Save();
+	void Load();
 
 	void SetEnabled(bool enabled);
 	bool GetEnabled();
@@ -23,4 +25,6 @@ public interface IModule : IInitializable, IPluginMetadata
 
 	void OnEnabled(bool initialized);
 	void OnDisabled(bool initialized);
+
+	T To<T>();
 }
