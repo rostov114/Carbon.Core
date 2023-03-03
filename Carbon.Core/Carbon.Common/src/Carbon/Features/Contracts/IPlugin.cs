@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
 using Carbon.Core;
 using Carbon.Plugins;
 using Oxide.Core;
@@ -9,6 +7,8 @@ namespace Carbon.Contracts
 {
 	public interface IPlugin : IMetadata, IHookable, IDisposable
 	{
+		bool IsCorePlugin { get; set; }
+
 		string Author { get; set; }
 		VersionNumber Version { get; set; }
 

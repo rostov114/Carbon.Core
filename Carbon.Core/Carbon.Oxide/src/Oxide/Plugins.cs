@@ -1,9 +1,6 @@
-﻿using System.Linq;
-using Carbon;
-using Carbon.Contracts;
-using Carbon.Core;
+﻿using System;
+using System.Linq;
 using Carbon.Plugins;
-using Facepunch;
 
 /*
  *
@@ -21,13 +18,17 @@ public class Plugins
 		return CarbonPlugin.Exists(name);
 	}
 
-	public IPlugin Find(string name)
+	public Plugin Find(string name)
 	{
-		return CarbonPlugin.Find(name);
+		return CarbonPlugin.Find(name) as Plugin;
 	}
 
-	public IPlugin[] GetAll()
+	public Plugin[] GetAll()
 	{
-		return CarbonPlugin.GetAll();
+		var plugins = CarbonPlugin.GetAll();
+		var result = plugins.Cast<Plugin>().ToArray();
+		Array.Clear(plugins, 0, result.Length);
+
+		return result;
 	}
 }
